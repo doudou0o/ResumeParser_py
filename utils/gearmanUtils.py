@@ -2,45 +2,59 @@
 # -*- coding: utf-8 -*-
 
 from gearman import GearmanClient
+import msgpack
+import json
+
 from commenUtils import client_worker
-from functools import wraps
 
-class GearmanClientWrapper:
-    def __init__(self, worker_name):
-        self.gearman_call_times = 0
-        self.worker_name = worker_name 
-        self.client = GearmanClient(
-                gm_conf_dict[self.worker_name]['host'])
 
-    def refresh_client(self):
-        self.gearman_call_times+=1
-        if self.gearman_call_times == 50:
-            self.gearman_call_times=0
-            self.client.shutdown()
-            self.client = GearmanClient(gm_conf_dict[self.worker_name]['host'])
 
-def GearmanClientWrapper(func):
-    call_times=0
-    @wraps(func)
-    def wrapper(*args, **kw):
-        client = GearmanClient(client_worker)
-        pass
-    return wrapper
-
-@GearmanClientWrapper
-def hf_html_parse_api(filetext, siteId):
-    worker_name = "grab_basic"
+def hf_html_parse_api(fileori, siteId):
+    workername = "grab_basic"
     packType = "msgpack"
-    return aaa
+
+    request = {}
+    request["w"] = "grab_basic"
+    request["c"] = "apis/logic_parse"
+    request["m"] = "parsers_engine"
+    request["d"] = "parsers_engine"
+    request["p"] = {
+            "body" : fileori,
+            "site_id" : siteId,
+            "type" : "resume",
+            }
+
+    req = {}
+    req["header"] = getHeader()
+    req["request"] = request
+
+    return send_request(workername, client_worker(workername), req, packType)
+
+def getHeader():
+    return {"user":"resume_parser"}
 
 
-def packRequest(req):
-    pass
+def packRequest(req, packType="msgpack"):
+    if packType == "msgpack":
+        return msgpack.packb(req)
+    else:
+        return json.dumps(req)
 
-def unpackResponse(res):
-    pass
+
+def unpackResponse(res, packType="msgpack"):
+    if packType == "msgpack":
+        return msgpack.unpackb(res)
+    else:
+        return json.loads(res)
 
 
+def send_request(workername, host, request, packType="msgpack"):
+    client = GearmanClient(host)
+    response = client.submit_job(workername, packRequest(request, packType))
+    result =  unpackResponse(response.result)
+    client.shutdown()
+    return result
+    
 
 
 

@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from convert import getConvertFunc
-from script.parsers import five1Parsers
-from script.parsers import zhilianParsers
-from script.parsers import htmlTemplateParser
-from script.parsers import generalParser
+from script.parsers import get_parser
+from script.parsers import parsernames
 
 def run(self, req):
     filename = req["filename"]
@@ -16,23 +14,17 @@ def run(self, req):
     if not filetext:
         convert = getConvertFunc(filename.split(".")[-1])
         filetext = convert(fileori)
-
-    # template parsers
-    result_51 = five1Parsers.parse(filetext, filename)
-    result_zl = zhilianParsers.parse(filetext, filename)
-
-    # html template parsers
-    result_ht = htmlTemplateParser.parse(filetext, filename)
-
-    # general parsers
-    result_gp = generalParser.parse(filetext, filename)
     
-    # merge each results
-    finalRet = mergeResults([result_51,result_zl,result_ht,result_gp])
+    parsers = (get_parser(t) for t in parsernames)
 
-    return finalRet
+    results = (parser(filetext, filename) for parser in parsers)
 
-def mergeResults(results):
+    final_result = merge_results(results)
+
+    return final_result
+
+
+def merge_results(results):
     """
     itype: results: list[dict(resume)]
     rtype: dict(resume)
