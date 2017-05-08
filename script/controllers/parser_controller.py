@@ -5,19 +5,21 @@ from convert import getConvertFunc
 from script.parsers import get_parser
 from script.parsers import parsernames
 
-def run(self, req):
+def run(req):
     filename = req["filename"]
     filetext = req["filetext"]
     fileori  = req["fileori"]
 
     # temporary module of convert file
-    if not filetext:
-        convert = getConvertFunc(filename.split(".")[-1])
-        filetext = convert(fileori)
-    
+    #if not filetext:
+    #    convert = getConvertFunc(filename.split(".")[-1])
+    #    filetext = convert(fileori)
+
     parsers = (get_parser(t) for t in parsernames)
 
-    results = (parser(filetext, filename) for parser in parsers)
+    #results = (parser(filename, filetext, fileori) for parser in parsers)
+
+    results = map(lambda p: p.parse(filename,filetext,fileori), parsers)
 
     final_result = merge_results(results)
 
@@ -55,4 +57,13 @@ def checkRequest(self, req):
     return self.getErrmsgByReq(req) == ""
 
 
+
+if __name__ == '__main__':
+    import sys
+    filepath = sys.argv[1]
+    req={}
+    req["filename"] = filepath.split("/")[-1]
+    req["fileori"] = open(filepath).read()
+    req["filetext"] = ""
+    print run(req)
 

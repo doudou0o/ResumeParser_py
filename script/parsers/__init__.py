@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import five1Parsers
-import zhilianParsers
-import htmlTemplateParser
-import generalParser
+import parser_five1
+import parser_zhilian
+import parser_htmltemplate
+import parser_general
 
 
 ##### config #####
 parsers_dict = {}
-parsers_dict["five1"]   = five1Parsers
-parsers_dict["zhilian"] = zhilianParsers
-parsers_dict["htmlTemplate"] = htmlTemplateParser
-parsers_dict["general"] = generalParser
+parsers_dict["five1"]   = parser_five1
+parsers_dict["zhilian"] = parser_zhilian
+parsers_dict["htmlTemplate"] = parser_htmltemplate
+parsers_dict["general"] = parser_general
 
 parsernames = parsers_dict.keys()
 
 ##### function #####
 
 def get_parser(pname):
-    parsers_dict.get(pname, None)
+    return parsers_dict.get(pname, None)
 
 

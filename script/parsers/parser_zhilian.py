@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-def parse(filetext, filename):
+def parse(filename, filetext, fileori):
     print "zhilian"
     return None
