@@ -11,9 +11,9 @@ def run(req):
     fileori  = req["fileori"]
 
     # temporary module of convert file
-    #if not filetext:
-    #    convert = getConvertFunc(filename.split(".")[-1])
-    #    filetext = convert(fileori)
+    if not filetext:
+        convert = getConvertFunc(filename.split(".")[-1])
+        filetext = convert(fileori)
 
     parsers = (get_parser(t) for t in parsernames)
 
