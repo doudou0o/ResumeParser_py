@@ -3,8 +3,8 @@
 
 from convert import getConvertFunc
 
-from script.parsers import get_parser
-from script.parsers import parsernames
+from resume_parser.parsers import get_parser
+from resume_parser.parsers import parsernames
 
 def run(req):
     filename = req["filename"]
@@ -35,7 +35,9 @@ def merge_results(results):
     rtype: dict(resume)
     """
     # TODO
-    return results[0]
+    for ret in results:
+        if ret:
+            return ret
 
 
 def getErrmsgByReq(self, req):

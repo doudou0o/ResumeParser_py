@@ -1,33 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from functools import partial
 
-from script.divideModule import divideModule
-import basic_template_parser
+from resume_parser.divideModule import divideModule
+import parser_basic
 
+"""
+51job parser
+"""
 
-def parse(filename, filetext, fileori):
-
-    resume_ret = basic_template_parser.get_resume_structor("five1 parse")
-
-    blocks = _splitHeadlineBlock(filetext)
-
-    _parseinfo_func_dict = _get_parse_func_dict()
-
-    #divideModule.print_HeadlineBlock(blocks)
-
-    for titles, text in blocks:
-        for t in titles:
-            m_pret = _parseinfo_func_dict[t](text)
-            insert_into_resume_ret(m_pret, t)
-        pass
-
-    pass
-    return None
+pname = "five1_parse"
 
 def _splitHeadlineBlock(filetext):
     """
-    rtype: list[[titles], text] 保证切出来的text被join后保持为原来的文本
+    rtype: list[[titles], text]
     """
     return divideModule.divideHeadlineBlock(filetext, headlines=Headline_Dict)
 
@@ -50,7 +37,37 @@ def _get_parse_func_dict():
     _parseinfo_func_dict[99] = _parse_basic_info
     _parseinfo_func_dict[1] = _parse_contact_info
     _parseinfo_func_dict[5] = _parse_education_info
+
     return _parseinfo_func_dict
+
+
+def parse(filename, filetext, fileori):
+
+    resume_ret = five1_parse(filetext)
+
+    # TODO
+    # filename can used to parse or confirm name in resume
+
+    # judge
+    if len(resume_ret["work"]) < 1 and len(resume_ret["education"]) < 1:
+        return None
+
+    return resume_ret
+
+
+def match(filetext):
+    blocks = _splitHeadlineBlock(filetext)
+    for titles, btext in blocks:
+        pass
+    pass
+
+def get_parse_init():
+    # 51job parse func
+    return  partial(parser_basic.parse,
+                    _splitHeadlineBlock,
+                    _get_parse_func_dict(),
+                    pname)
+five1_parse = get_parse_init()
 
 # 51job headlines
 Headline_Dict={}

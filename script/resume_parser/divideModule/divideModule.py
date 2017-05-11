@@ -1,22 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from utils import StringUtils
 import re
 import os
 
-conf_file_path = os.path.join(os.path.dirname(__file__),"headlines_dict.conf")
-global_headline = {}
-with open(conf_file_path) as fp:
-    for line in fp:
-        line = line.strip().decode('utf8')
-        if line.startswith('#'): continue
-        items = line.split(',');
-        if len(items)<3: continue;
-        m_id = int(items[0])
-        for word in items[2].split(';'):
-            if word.strip():
-                global_headline[word.strip()] = m_id
+from resume_parser.utils import StringUtils
+
 
 """
 DivideModule
@@ -32,12 +21,13 @@ usage:
 */
 """
 
+
 def divideHeadlineBlock(text, headlines={}, isOnly=False):
     """
     :itype: text: unicode
     :itype: headlines: list[unicode]
     :itype: isOnly: boolean
-    :rtype: list[[title], unicode]
+    :rtype: list[[title], unicode] 保证切出来的text被join后保持为原来的文本
     """
 
     if isOnly:
@@ -60,7 +50,7 @@ def divideHeadlineBlock(text, headlines={}, isOnly=False):
             blocks.append([h, lines[i]])
         else:
             blocks[-1][1] += '\n'+lines[i]
-        
+
     return blocks
 
 
@@ -80,6 +70,29 @@ def print_HeadlineBlock(blocks):
         print "======="
         print block[1]
 
+
+def getNameByBid(bid):
+    return bid_name_dict.get(bid, "unknow")
+
+
+def init_readconf():
+    conf_file_path = os.path.join(os.path.dirname(__file__),"headlines_dict.conf")
+    global_headline = {}
+    bid_name_dict = {}
+    with open(conf_file_path) as fp:
+        for line in fp:
+            line = line.strip().decode('utf8')
+            if line.startswith('#'):
+                continue
+            items = line.split(',');
+            if len(items)<3: continue;
+            m_id = int(items[0])
+            m_name = items[1]
+            bid_name_dict[m_id] = m_name
+            for word in items[2].split(';'):
+                if word.strip():
+                    global_headline[word.strip()] = m_id
+    return global_headline, bid_name_dict
 
 
 def _isHeadline(preline, line, headlines_dict):
@@ -105,3 +118,5 @@ def _clean_cand_headline(text):
     return text
 
 
+# global dict init
+global_headline, bid_name_dict = init_readconf()

@@ -3,19 +3,20 @@
 
 import sys
 
-print "dir:", dir()
-print "name", __name__
-print "package", __package__
-
-print sys.path
+import resume_parser.controllers.parser_controller as parser
 
 
-sys.path.append("/opt/userhome/icchenchen/ecv_parser/resume_parser_module/")
-sys.path.append("/opt/userhome/icchenchen/ecv_parser/resume_parser_module/log")
 
-import script
 
-from script.controllers import parser_controller
+filepath = sys.argv[1]
+ori = open(filepath).read()
 
-print open("2.txt").read()
+
+req={}
+req["filename"] = filepath.split('/')[-1]
+req["filetext"] = ""
+req["fileori"]  = ori
+
+print parser.run(req)
+
 

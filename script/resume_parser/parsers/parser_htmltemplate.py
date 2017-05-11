@@ -6,7 +6,7 @@ import logging
 
 logger = logging.getLogger("mylog")
 
-from utils.GearmanUtils import hf_html_parse_api as htmltemplate_api
+from resume_parser.utils.GearmanUtils import hf_html_parse_api as htmltemplate_api
 
 def parse(filename, filetext, fileori):
     print "html parser"

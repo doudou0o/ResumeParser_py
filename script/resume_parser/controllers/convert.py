@@ -3,7 +3,6 @@
 
 import jpype
 import html2text as html2text
-print "sdasd"
 
 def getConvertFunc(fileext):
     """
