@@ -3,8 +3,8 @@
 
 from functools import partial
 
-from resume_parser.divideModule import divideModule
 import parser_basic
+from resume_parser import divideModule
 
 """
 51job parser
@@ -25,7 +25,17 @@ def _parse_contact_info(text):
     pass
 
 def _parse_education_info(text):
+    exp_blocks = _split_eduexp_block(text)
+    for exp in exp_blocks:
+        pass
     pass
+
+def _split_eduexp_block(text):
+    reg_time_edu = u"^\d{4}/\d{1,2}\s*-\s*((\d{4}/\d{1,2})|至今)"
+    reg_time_edu_alone = u"^\d{4}\s*/\d{1,2}"
+    exp_blocks = divideModule.divideExpBlock(text, timeregs=[reg_time_edu, reg_time_edu_alone])
+    return exp_blocks
+
 
 def _get_parse_func_dict():
     """

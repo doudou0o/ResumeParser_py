@@ -3,8 +3,10 @@
 
 import re
 import os
+from functools import partial
 
 from resume_parser.utils import StringUtils
+from resume_parser.recognize import timepair_match
 
 
 """
@@ -54,14 +56,18 @@ def divideHeadlineBlock(text, headlines={}, isOnly=False):
     return blocks
 
 
-def divideExpBlock(text, timeReg=None ,isOnlt=True):
+def divideExpBlock(text, timeRegs=None):
     """
     :itype: text: unicode
     :itype: timeReg: Pattern
-    :itype: isOnly: boolean
     :rtype: list[unicode]
     """
-    pass
+    if timeRegs:
+        timematch = partial(timepair_match.match_timestamp_by_reg, timeRegs)
+    else:
+        timematch = timepair_match.match_timestamp
+
+
 
 
 def print_HeadlineBlock(blocks):
