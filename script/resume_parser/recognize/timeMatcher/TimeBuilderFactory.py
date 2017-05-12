@@ -5,6 +5,10 @@ import ConfigParser
 import sys
 import re
 import logging
+import os
+
+dirpath  = os.path.dirname(__file__)
+timeconf = os.path.join(dirpath, "timeBNF.conf")
 
 """TimeBuilders is used as Factory to produce TimeBuilder"""
 TimeBuilders = {}
@@ -32,8 +36,7 @@ class TimeBuilder():
         self.timeClass = None
         self.reg = ""
         self.conf_info = {}
-        import pdb; pdb.set_trace()
-        self.readConf(__file__+"/timeMatcher/timeBNF.conf")
+        self.readConf(timeconf)
         pass
 
     def new(self):

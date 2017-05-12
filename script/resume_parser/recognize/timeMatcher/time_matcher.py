@@ -6,7 +6,11 @@ import ConfigParser
 import re
 import TimeBuilderFactory
 from TimeBuilderFactory import Time_Pair
+import os
 
+
+dirpath  = os.path.dirname(__file__)
+timeconf = os.path.join(dirpath, 'timeBNF.conf')
 
 
 class TimeMatcher():
@@ -15,7 +19,7 @@ class TimeMatcher():
     def __init__(self):
         self.priority_TimeName_list = []
         self.conf = ConfigParser.ConfigParser()
-        self.readConf(__file__+"/timeMatcher/timeBNF.conf")
+        self.readConf(timeconf)
         self.init()
 
     def init(self):
