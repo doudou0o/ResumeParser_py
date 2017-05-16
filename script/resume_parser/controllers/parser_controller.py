@@ -18,6 +18,7 @@ def run(req):
         if len(filetext) < 20:
             raise Exception("file text is too short!!")
 
+    print filetext
     parsers = (get_parser(t) for t in parsernames)
 
     #results = (parser(filename, filetext, fileori) for parser in parsers)

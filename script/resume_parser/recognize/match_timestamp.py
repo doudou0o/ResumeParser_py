@@ -46,5 +46,8 @@ def _build_timestamp_str(match):
         timestamp += groupdict["em"]+u"月"
     if "ed" in groupdict:
         timestamp += groupdict["ed"]+u"日"
+    if "ep" in groupdict:
+        timestamp += "present"
+
     return timestamp
 

@@ -7,6 +7,9 @@ def get_resume_struct(parser_name):
     resume["parser_name"] = parser_name
     return resume
 
+def get_basic_struct():
+    return resume_basic_struct.copy()
+
 def get_education_struct():
     return resume_edu_struct.copy()
 
@@ -103,6 +106,53 @@ resume_struct = {
             },
 }
 
+# origin resume basic info struct
+resume_basic_struct = {
+    "updated_at"  : "0000-00-00 00:00:00",
+    "resume_name" : "",
+    "is_validate" : "U",
+    "name"        : "",
+    "gender"      : "U",
+    "birth"       : "",
+    "age"         : 0 ,
+    "marital"     : "U",
+    "degree"      : 99 ,
+    "current_status" : "",
+    "work_experience"       : 0 ,
+    "address_province"      : "",
+    "address"               : "",
+    "account_province"      : "",
+    "account"               : "",
+    "card"                  : "",
+    "expect_work_at"        : "",
+    "expect_industry_name"  : "",
+    "expect_position_name"  : "",
+    "expect_city_ids"       : "",
+    "expect_city_names"     : "",
+    "expect_salary_from"    : "",
+    "expect_salary_to"      : "",
+    "expect_annual_salary_from"    : "",
+    "expect_annual_salary_to"      : "",
+    "expect_salary_month"   : "",
+    "self_remark"           : "",
+    "my_project"            : "",
+    # 其他
+    "is_fertility"          : "U",
+    "is_house"              : "U",
+    "live_family"           : "U",
+    "interests"             : "",
+    "focused_corporations"  : "",
+    "focused_feelings"      : "",
+    "overseas"              : "N",
+    "political_status"      : "",
+    "expect_type"           : "",
+    "expect_bonus"          : "",
+    "project_info"          : "",
+    "other_info"            : "",
+    "not_expect_corporation_name"   : "",
+    "not_expect_corporation_ids"    : "",
+    "not_expect_corporation_status" : 0 ,
+}
 
 # origin resume work info struct
 resume_work_struct = {

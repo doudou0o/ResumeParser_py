@@ -17,15 +17,18 @@ def parse(split_headlineblock_func=None, parse_func_dict=None, pname="", text=""
     resume_ret = resume_struct.get_resume_struct(pname)
 
     blocks = split_headlineblock_func(text)
+    #divideModule.print_HeadlineBlock(blocks)
 
     for titles, btext in blocks:
         for bid in titles:
-            if bid not in parse_func_dict:
-                continue
-            m_pret = parse_func_dict[bid](btext)
-            if not m_pret:
-                continue
+            if bid not in parse_func_dict:continue
 
+            # parse
+            m_pret = parse_func_dict[bid](btext)
+
+            if not m_pret:continue
+
+            # update resume_ret
             if   type(resume_ret[getNameByBid(bid)]) == dict:
                 resume_ret[getNameByBid(bid)].update(m_pret)
             elif type(resume_ret[getNameByBid(bid)]) == dict:

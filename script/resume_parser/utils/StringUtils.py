@@ -54,3 +54,21 @@ def removeGeneralPunctuation(line):
     generalPunctuation = re.compile(u"\u2000-\u206f")
     line = generalPunctuation.sub("",line)
     return line
+
+def transform_timestamp(timestamp_str):
+    """
+    itype: timestamp_str unicode (satisfied timestamp)
+    rtype: start_time, end_time, so_far
+    """
+    if not timestamp_str or -1 == timestamp_str.find("-"):
+        return "","",""
+
+    start_time,end_time,so_far = "","",""
+
+    start_time = timestamp_str.split("-")[0]
+    if "present" == timestamp_str.split("-")[1]:
+        so_far = "Y"
+    else:
+        end_time = timestamp_str.split["-"][1]
+
+    return start_time, end_time, so_far
