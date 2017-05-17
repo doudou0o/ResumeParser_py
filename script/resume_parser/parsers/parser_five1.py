@@ -35,7 +35,7 @@ def _parse_education_info(split_eduexp_block, extract_eduinfo, text):
     itype: split_eduexp_block: function
     itype: extract_eduinfo: function
     itype: text unicode
-    rtype: contact struct
+    rtype: edu struct
     """
     edu_info_list = []
     exp_blocks = split_eduexp_block(text)
@@ -47,6 +47,49 @@ def _parse_education_info(split_eduexp_block, extract_eduinfo, text):
     pass
     return edu_info_list
 
+def _parse_employment_info(split_workexp_block, extract_workinfo, text):
+    """
+    itype: split_workexp_block: function
+    itype: extract_workinfo: function
+    itype: text unicode
+    rtype: work struct
+    """
+    work_info_list = []
+    exp_blocks = split_workexp_block(text)
+    for exp in exp_blocks:
+        work_info = extract_workinfo(exp)
+        # judge
+        # TODO
+        work_info_list.append(work_info)
+    pass
+    return work_info_list
+
+def _parse_expect_info(extract_expectinfo, text):
+    """
+    itype: extract_expectinfo: function
+    itype: text unicode
+    rtype: map
+    """
+    return extract_expectinfo(text)
+
+def _parse_language_info(split_lang_block, extract_langinfo, text):
+    """
+    itype: split_lang_block: function
+    itype: extract_langinfo: function
+    itype: text unicode
+    rtype: language struct
+    """
+    language_info_list = []
+    exp_blocks = split_lang_block(text)
+    for exp in exp_blocks:
+        language_info = extract_langinfo(exp)
+        # judge
+        # TODO
+        language_info_list.append(language_info)
+    pass
+    return language_info_list
+
+
 def _get_parse_func_dict(template):
     """
     可配置方式: 一个配置方法
@@ -54,12 +97,16 @@ def _get_parse_func_dict(template):
     其他方法可以复用
     """
     _parseinfo_func_dict = {}
-    _parseinfo_func_dict[0] = partial(_parse_basic_info, template.extract_basicinfo)
-    _parseinfo_func_dict[3] = partial(_parse_basic_info, template.extract_basicinfo)
+    _parseinfo_func_dict[0]  = partial(_parse_basic_info, template.extract_basicinfo)
+    _parseinfo_func_dict[3]  = partial(_parse_basic_info, template.extract_basicinfo)
     _parseinfo_func_dict[99] = partial(_parse_basic_info, template.extract_basicinfo)
+    _parseinfo_func_dict[2]  = partial(_parse_expect_info, template.extract_expectinfo)
     _parseinfo_func_dict[1] = partial(_parse_contact_info, template.extract_contactinfo)
     _parseinfo_func_dict[5] = partial(_parse_education_info, 
             template.split_eduexp_block, template.extract_eduinfo
+            )
+    _parseinfo_func_dict[4] = partial(_parse_employment_info, 
+            template.split_workexp_block, template.extract_workinfo
             )
 
     return _parseinfo_func_dict

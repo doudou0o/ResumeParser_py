@@ -18,7 +18,7 @@ def split_headline_block(filetext):
     """
     rtype: list[[titles], text]
     """
-    return divideModule.divideHeadlineBlock(filetext, headlines=Headline_Dict)
+    return divideModule.divideHeadlineBlock(filetext, headlines=Headline_Dict,isOnly=True)
 
 def split_eduexp_block(text):
     def issplit(i, lines):
@@ -29,34 +29,57 @@ def split_eduexp_block(text):
     exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
     return exp_blocks
 
+def split_workexp_block(text):
+    def issplit(i, lines):
+        if re.search(work_reg, lines[i]):
+            return True
+        else:
+            return False
+    exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
+    return exp_blocks
+
+def split_language_block(text):
+    def issplit(i, lines):
+        if match_basic.match_language(lines[i]):
+            return True
+        else:
+            return False
+    exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
+    return exp_blocks
+
+
 def extract_eduinfo(expblock):
-    found_school = False
-    lastline = ""
     edu = resume_struct.get_education_struct()
     edu["ori_text"] = expblock
+
+    lastline = "not found school"
     for line in expblock.split("\n"):
-        if not found_school:
+        if lastline == "not found school":
             m = re.search(edu_reg, line)
             if m:
-                timestamp = match_timestamp.match_timestamp_by_reg(line, edu_reg)
-                edu["school"] = m.group("school")
+                timestamp = match_timestamp.match_timestamp_by_reg(edu_reg, line)
+                edu["school_name"] = re.sub(u"海外经历","",m.group("school")).strip()
                 edu["start_time"], edu["end_time"], edu["so_far"] = StringUtils.transform_timestamp(timestamp)
+                lastline = "school"
         elif lastline == "school":
             items = line.split("|")
             if len(items) >= 2:
-                edu["degree"] = match_degree.match_degree(items, 99)
-                edu["degree_ori"] = items[0]
-                edu["discipline_name"] = items[1]
+                edu["degree"] = match_degree.match_degree(items[0], 99)
+                edu["degree_ori"] = items[0].strip()
+                edu["discipline_name"] = items[1].strip()
             else:
                 if match_degree.match_degree(items):
-                    edu["degree"] = match_degree.match_degree(items)
-                    edu["degree_ori"] = items[0]
+                    edu["degree"] = match_degree.match_degree(items[0])
+                    edu["degree_ori"] = items[0].strip()
                 else:
-                    edu["discipline_name"] = items[0]
+                    edu["discipline_name"] = items[0].strip()
+            lastline = "degree"
         elif lastline == "degree":
-            edu["discipline_desc"] += '\n'+line
+            edu["discipline_desc"] += '\n'+line.strip() if edu["discipline_desc"] else line.strip()
         pass
     pass
+    edu["discipline_desc"] =  re.sub(u"^专业描述(：|:)", "", edu["discipline_desc"]).strip()
+    return edu
 
 def extract_basicinfo(text):
     basic_info = {}
@@ -80,15 +103,15 @@ def extract_basicinfo(text):
             basic_info["gender"] = match_basic.match_gender(line)
         mage = re.search(u"\d+岁", line)
         if mage: basic_info["age"] = int(mage.group()[:-1])
-        mbirth = re.search(u"\d{4}年\d{2}月\d{2}日", line)
-        if mbirth: basic_info["birth"] = mbirth.group()
+        mbirth = re.search(u"\d{4}年\d{1,2}月\d{1,2}日", line)
+        if mbirth and mage: basic_info["birth"] = mbirth.group()
         ## others
         mtel = re.search(u"家庭电话：(.+)", line)
         if mtel: basic_info["contact_tel"] = mtel.group(1).strip()
         mexp = re.search(u"(\d+)年工作经验", line)
         if mexp: basic_info["work_experience"] = int(mexp.group(1))
         mmary = re.search(u"婚姻状况：(.+)", line)
-        if mmary: basic_info["marital"] = mmary.group(1).strip()
+        if mmary:basic_info["marital"] = match_basic.match_marital(mmary.group(1).strip())
         maccount = re.search(u"户口/国籍：(.+)", line)
         if maccount:
             basic_info["account_str"] = maccount.group(1).strip()
@@ -100,7 +123,7 @@ def extract_basicinfo(text):
 
     return  basic_info
 
-def extract_contactinfo(text, contact_info_ori):
+def extract_contactinfo(text):
     contact_info = {}
 
     phone = match_basic.match_phone(text)
@@ -114,6 +137,80 @@ def extract_contactinfo(text, contact_info_ori):
     pass
     return contact_info
 
+def extract_expectinfo(text):
+    expectinfo = {}
+    selfremark = False
+    for line in text.split("\n"):
+        mloc = re.search(u"^地点：(.+)$", line)
+        if mloc:
+            expectinfo["expect_city_names"] = re.sub(u"[\u2003 ]", ",", mloc.group(1).strip()).strip()
+        mpos = re.search(u"^职能：(.+)$", line)
+        if mpos:
+            expectinfo["expect_position_name"] = re.sub(u"[\u2003 ]", ",", mpos.group(1).strip()).strip()
+        mindus = re.search(u"^行业：(.+)$", line)
+        if mindus:
+            expectinfo["expect_industry_name"] = re.sub(u"[\u2003 ]", ",", mindus.group(1).strip()).strip()
+
+        if selfremark:
+            expectinfo["self_remark"] += "\n"+line
+        mselfremark = re.search(u"^自我评价：(.+)", line)
+        if mselfremark:
+            expectinfo["self_remark"] = re.sub(u"自我评价：","",line).strip()
+            selfremark = True
+    return expectinfo
+
+
+
+
+
+
+
+    pass
+
+def extract_workinfo(text):
+    work = resume_struct.get_emplyment_struct()
+    work["ori_text"] = text
+
+    lastline = "not found company"
+    for line in text.split('\n'):
+        if lastline == "not found company":
+            m_company = re.search(work_reg, line)
+            if m_company:
+                timestamp = match_timestamp.match_timestamp_by_reg(work_reg, line)
+                work["corporation_name"] = m_company.group("company")
+                work["start_time"], work["end_time"], work["so_far"] = StringUtils.transform_timestamp(timestamp)
+                lastline = "company name"
+            pass
+        elif lastline == "company name":
+            items = line.split("|")
+            if len(items)>0: work["industry_name"] = items[0].strip()
+            lastline = "industry"
+        elif lastline == "industry":
+            items = re.split("\s+", line)
+            if len(items) > 1:
+                work["architecture_name"] = items[0]
+                work["position_name"] = items[1]
+            lastline = "position"
+        elif lastline == "position":
+            work["responsibilities"] += '\n'+line if work["responsibilities"] else line
+    pass
+    work["responsibilities"] = re.sub(u"^工作描述(:|：)", "",  work["responsibilities"]).strip()
+    return work
+
+
+def extract_languageinfo(text):
+    lang = resume_struct.get_language_struct()
+    lines = text.split('\n')
+    for line_pre, line in izip([""]+lines, lines):
+        ans = match_basic.match_language(line_pre)
+        if ans:
+            lang["name"] = ans
+            lang["level"] = line
+        pass
+    return lang
+
+def extract_certinfo(text):
+    pass
 
 ###### 51job_0 template config
 # 51job headlines
@@ -124,6 +221,7 @@ Headline_Dict[u"教育经历"] =  5
 Headline_Dict[u"工作经验"] =  4
 Headline_Dict[u"项目经验"] =  6
 Headline_Dict[u"语言能力"] =  8
+Headline_Dict[u"语言"] =  8
 
 Headline_Dict[u"所获奖项"] = 99
 Headline_Dict[u"培训经历"] =  9
@@ -147,4 +245,6 @@ edu_reg = u"(?P<sy>\d{4})\s*/\s*(?P<sm>\d{1,2})-(((?P<ey>\d{4})\s*/\s*(?P<em>\d{
 
 # 51job work config
 company_start = u"\d{4}/\d{1,2}\s*-\s*(\d{4}/\d{1,2}|至今)\s*(.+)(\d+年|\d+个月)"
+
+work_reg = u"^(?P<sy>\d{4})/(?P<sm>\d{1,2})\s*-\s*((?P<ey>\d{4})/(?P<em>\d{1,2})|(?P<ep>至今))\s*(?P<company>.+\s).+(\d+年|\d+个月)"
 

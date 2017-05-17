@@ -18,10 +18,10 @@ def run(req):
         if len(filetext) < 20:
             raise Exception("file text is too short!!")
 
-    print filetext
-    parsers = (get_parser(t) for t in parsernames)
+    filetext = clean_filetext(filetext) 
+    #print filetext
 
-    #results = (parser(filename, filetext, fileori) for parser in parsers)
+    parsers = (get_parser(t) for t in parsernames)
 
     results = map(lambda p: p.parse(filename,filetext,fileori), parsers)
 
@@ -41,7 +41,7 @@ def merge_results(results):
             return ret
 
 
-def getErrmsgByReq(self, req):
+def getErrmsgByReq(req):
     """
     :itype req: dict{}
     :rtype  : unicode (if req is valid return "")
@@ -55,13 +55,22 @@ def getErrmsgByReq(self, req):
 
     return ""
 
-def checkRequest(self, req):
+def checkRequest(req):
     """
     :itype req: dict{}
     :rtype boolean
     """
     return self.getErrmsgByReq(req) == ""
 
+def clean_filetext(filetext):
+    lines = []
+    for line in filetext.split("\n"):
+        line = line.strip()
+        if len(line) < 2:
+            continue
+        else:
+            lines.append(line)
+    return "\n".join(lines)
 
 
 if __name__ == '__main__':

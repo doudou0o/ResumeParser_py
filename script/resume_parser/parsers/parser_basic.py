@@ -17,7 +17,7 @@ def parse(split_headlineblock_func=None, parse_func_dict=None, pname="", text=""
     resume_ret = resume_struct.get_resume_struct(pname)
 
     blocks = split_headlineblock_func(text)
-    #divideModule.print_HeadlineBlock(blocks)
+    divideModule.print_HeadlineBlock(blocks)
 
     for titles, btext in blocks:
         for bid in titles:
@@ -31,8 +31,8 @@ def parse(split_headlineblock_func=None, parse_func_dict=None, pname="", text=""
             # update resume_ret
             if   type(resume_ret[getNameByBid(bid)]) == dict:
                 resume_ret[getNameByBid(bid)].update(m_pret)
-            elif type(resume_ret[getNameByBid(bid)]) == dict:
-                resume_ret[getNameByBid(bid)].append(m_pret)
+            elif type(resume_ret[getNameByBid(bid)]) == list:
+                resume_ret[getNameByBid(bid)].extend(m_pret)
             else:
                 resume_ret[getNameByBid(bid)] = m_pret
         pass

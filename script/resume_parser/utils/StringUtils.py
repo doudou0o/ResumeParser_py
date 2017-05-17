@@ -3,6 +3,7 @@
 
 import re
 
+
 def clean_all_un_chinese(text, ignores=[]):
     ans = []
     for word in "".join(gen_en_cn_split(text)).split(" "):
@@ -55,6 +56,29 @@ def removeGeneralPunctuation(line):
     line = generalPunctuation.sub("",line)
     return line
 
+def removeChSpace(text):
+    s,e = -1,-1
+    space_list = []
+    for i, c in enumerate(text):
+        if is_cn_chr(c):
+            if s != -1:
+                space_list.append([s,i])
+                s = i
+            else: s = i
+        elif c in {" ", "\t"}:
+            continue
+        else:
+            s = -1
+    space_list.reverse()
+    for s, e in space_list:
+        text = text[:s+1] + text[e:]
+    return text
+
+
+
+
+
+
 def transform_timestamp(timestamp_str):
     """
     itype: timestamp_str unicode (satisfied timestamp)
@@ -69,6 +93,6 @@ def transform_timestamp(timestamp_str):
     if "present" == timestamp_str.split("-")[1]:
         so_far = "Y"
     else:
-        end_time = timestamp_str.split["-"][1]
+        end_time = timestamp_str.split("-")[1]
 
     return start_time, end_time, so_far
