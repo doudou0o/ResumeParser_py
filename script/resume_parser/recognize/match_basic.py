@@ -3,7 +3,6 @@
 
 import re
 
-import bank
 
 """
 match_phone
@@ -60,9 +59,16 @@ def match_marital(text):
         return "U"
 
 def match_language(text):
-    ans = bank.find_language(text)
-    if ans:
-        return ans
+    ### after bank is ready
+    #ans = bank.find_language(text)
+    #if ans:
+    #    return ans
+    #else:
+    #    return None
+
+    ### templary way
+    if text.endswith(u"语") and len(text) < 4:
+        return text
     else:
         return None
     

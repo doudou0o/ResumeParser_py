@@ -38,14 +38,42 @@ def split_workexp_block(text):
     exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
     return exp_blocks
 
-def split_language_block(text):
+def split_project_block(text):
     def issplit(i, lines):
-        if match_basic.match_language(lines[i]):
+        if re.search(project_reg, lines[i]):
             return True
         else:
             return False
     exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
     return exp_blocks
+
+def split_language_block(text):
+    def issplit(i, lines):
+        if match_basic.match_language(re.split("\s+", lines[i])[0]):
+            return True
+        else:
+            return False
+    exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
+    return exp_blocks
+
+def split_certificate_block(text):
+    def issplit(i, lines):
+        if re.search(certi_reg, lines[i]):
+            return True
+        else:
+            return False
+    exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
+    return exp_blocks
+
+def split_train_block(text):
+    def issplit(i, lines):
+        if re.search(train_reg, lines[i]):
+            return True
+        else:
+            return False
+    exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
+    return exp_blocks
+
 
 
 def extract_eduinfo(expblock):
@@ -88,8 +116,8 @@ def extract_basicinfo(text):
     lines = text.split('\n')
     for line_pre, line in izip([""]+lines, lines):
         ## name update
-        if re.search(u"(.+)\s+流程状态.+标签.+", line):
-            basic_info["name"] = re.search(u"(.+)\s+流程状态", line).group(1).strip()
+        if re.search(u"(.+)\s*流程状态.+标签.+", line):
+            basic_info["name"] = re.search(u"(.+)\s*流程状态", line).group(1).strip()
             if line_pre.strip().startswith(u"更新时间："):
                 m = re.search("\d{4}-\d{2}-\d{2}", line_pre)
                 if m: basic_info["updated_at"]=m.group()
@@ -160,13 +188,6 @@ def extract_expectinfo(text):
     return expectinfo
 
 
-
-
-
-
-
-    pass
-
 def extract_workinfo(text):
     work = resume_struct.get_emplyment_struct()
     work["ori_text"] = text
@@ -177,7 +198,7 @@ def extract_workinfo(text):
             m_company = re.search(work_reg, line)
             if m_company:
                 timestamp = match_timestamp.match_timestamp_by_reg(work_reg, line)
-                work["corporation_name"] = m_company.group("company")
+                work["corporation_name"] = m_company.group("company").strip()
                 work["start_time"], work["end_time"], work["so_far"] = StringUtils.transform_timestamp(timestamp)
                 lastline = "company name"
             pass
@@ -197,20 +218,89 @@ def extract_workinfo(text):
     work["responsibilities"] = re.sub(u"^工作描述(:|：)", "",  work["responsibilities"]).strip()
     return work
 
+def extract_projectinfo(text):
+    project = resume_struct.get_project_struct()
+    project["ori_text"] = text
+
+    lastline = "not found project"
+    isResp, isDesc = False,False
+    for line in text.split('\n'):
+        if lastline == "not found project":
+            m_proj = re.search(project_reg, line)
+            if m_proj:
+                timestamp = match_timestamp.match_timestamp_by_reg(project_reg, line)
+                project["name"] = m_proj.group("project").strip()
+                project["start_time"], project["end_time"], project["so_far"] = StringUtils.transform_timestamp(timestamp)
+                lastline = "project"
+            pass
+        elif lastline == "project":
+            m_desc = re.search(u"项目描述(:|：)", line)
+            if m_desc:
+                line = re.sub(u"项目描述(:|：)","", line).strip()
+                isDesc, isResp = True, False
+            m_resp = re.search(u"责任描述(:|：)", line)
+            if m_resp:
+                line = re.sub(u"责任描述(:|：)","", line).strip()
+                isDesc, isResp = False, True
+            pass
+            if isDesc: project["describe"] += '\n'+line if project["describe"] else line
+            if isResp: project["responsibilities"] += '\n'+line if project["responsibilities"] else line
+    pass
+    return project
 
 def extract_languageinfo(text):
     lang = resume_struct.get_language_struct()
     lines = text.split('\n')
+
     for line_pre, line in izip([""]+lines, lines):
         ans = match_basic.match_language(line_pre)
+        # 语言和等级分两行的情况
         if ans:
-            lang["name"] = ans
-            lang["level"] = line
+            lang["name"] = ans.strip()
+            lang["level"] = line.strip()
+        # 语言和等级在一行的情况
+        else:
+            items = filter(lambda x: len(x)>1 , re.split("\s+", line))
+            if len(items)==2 and match_basic.match_language(items[0]):
+                lang["name"] = items[0]
+                lang["level"] = items[1]
         pass
     return lang
 
 def extract_certinfo(text):
-    pass
+    cert = resume_struct.get_certificate_struct()
+
+    for line in text.split('\n'):
+        m_cert = re.search(certi_reg, line)
+        if m_cert:
+            timestamp = match_timestamp.match_timestamp_by_reg(certi_reg, line)
+            cert["name"] = m_cert.group("name").strip()
+            cert["start_time"], _,_ = StringUtils.transform_timestamp(timestamp)
+
+    return cert
+
+def extract_traininfo(text):
+    train = resume_struct.get_training_struct()
+
+    for line in text.split('\n'):
+        m_train = re.search(train_reg, line)
+        if m_train:
+            timestamp = match_timestamp.match_timestamp_by_reg(train_reg, line)
+            train["name"] = m_train.group("train").strip()
+            train["start_time"], train["end_time"], train["so_far"] = StringUtils.transform_timestamp(timestamp)
+        mauth = re.search(u"^培训机构：(.+)", line)
+        if mauth:
+            train["authority"] = mauth.group(1).strip()
+        mcity = re.search(u"^培训地点：(.+)", line)
+        if mcity:
+            train["city"] = mcity.group(1).strip()
+        mdesc = re.search(u"^培训描述：(.+)", line)
+        if mdesc:
+            train["description"] = mdesc.group(1).strip()
+
+    return train
+
+
 
 ###### 51job_0 template config
 # 51job headlines
@@ -248,3 +338,9 @@ company_start = u"\d{4}/\d{1,2}\s*-\s*(\d{4}/\d{1,2}|至今)\s*(.+)(\d+年|\d+�
 
 work_reg = u"^(?P<sy>\d{4})/(?P<sm>\d{1,2})\s*-\s*((?P<ey>\d{4})/(?P<em>\d{1,2})|(?P<ep>至今))\s*(?P<company>.+\s).+(\d+年|\d+个月)"
 
+# 51job project config
+project_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})-((?P<ey>\d{4})\s*/(?P<em>\d{1,2})|(?P<ep>至今))(?P<project>.+)"
+
+certi_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})\s+(?P<name>.+)"
+
+train_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})-((?P<ey>\d{4})\s*/(?P<em>\d{1,2})|(?P<ep>至今))\s+(?P<train>.+)"
