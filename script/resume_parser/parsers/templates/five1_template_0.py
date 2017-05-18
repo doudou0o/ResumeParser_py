@@ -178,6 +178,13 @@ def extract_expectinfo(text):
         mindus = re.search(u"^行业：(.+)$", line)
         if mindus:
             expectinfo["expect_industry_name"] = re.sub(u"[\u2003 ]", ",", mindus.group(1).strip()).strip()
+        msalary = re.search(u"^期望薪资：(.+)$", line)
+        if msalary:
+            expectsalary = msalary.group(1).strip()
+            m_monthsal = re.search("(?P<f>\d{3,5})-(?P<t>\d{3,5})", expectsalary)
+            if m_monthsal:
+                expectinfo["expect_salary_from"] = float(m_monthsal.group('f'))/1000.0
+                expectinfo["expect_salary_to"] = float(m_monthsal.group('t'))/1000.0
 
         if selfremark:
             expectinfo["self_remark"] += "\n"+line
