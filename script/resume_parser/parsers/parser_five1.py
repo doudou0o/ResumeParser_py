@@ -208,6 +208,9 @@ def parse(filename, filetext, fileori):
         if "contact_email" in resume_ret["basic"]:
             resume_ret["contact"]["email"] = resume_ret["basic"]["contact_email"]
 
+        # add resume name
+        resume_ret["basic"]["resume_name"] = filename
+
         return resume_ret
 
     return None

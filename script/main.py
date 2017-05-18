@@ -14,7 +14,7 @@ ori = open(filepath).read()
 
 
 req={}
-req["filename"] = filepath.split('/')[-1]
+req["filename"] = filepath.split('/')[-1].decode("utf8")
 req["filetext"] = ""
 req["fileori"]  = ori
 
