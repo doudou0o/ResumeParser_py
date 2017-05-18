@@ -10,7 +10,6 @@ from CommonUtils import client_worker
 
 
 def hf_html_parse_api(fileori, siteId):
-    import pdb; pdb.set_trace()
     workername = "grab_basic"
     packType = "msgpack"
 

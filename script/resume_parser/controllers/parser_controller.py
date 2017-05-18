@@ -19,7 +19,6 @@ def run(req):
             raise Exception("file text is too short!!")
 
     filetext = clean_filetext(filetext) 
-    #print filetext
 
     parsers = (get_parser(t) for t in parsernames)
 
@@ -60,7 +59,7 @@ def checkRequest(req):
     :itype req: dict{}
     :rtype boolean
     """
-    return self.getErrmsgByReq(req) == ""
+    return getErrmsgByReq(req) == ""
 
 def clean_filetext(filetext):
     lines = []

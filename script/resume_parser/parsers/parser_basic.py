@@ -17,7 +17,7 @@ def parse(split_headlineblock_func=None, parse_func_dict=None, pname="", text=""
     resume_ret = resume_struct.get_resume_struct(pname)
 
     blocks = split_headlineblock_func(text)
-    divideModule.print_HeadlineBlock(blocks)
+    #divideModule.print_HeadlineBlock(blocks)
 
     for titles, btext in blocks:
         for bid in titles:

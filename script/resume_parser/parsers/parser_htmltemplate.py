@@ -23,6 +23,8 @@ def parse(filename, filetext, fileori):
 
     for sid in sids:
         result = get_remote_htmltemplate_ret(fileori, sid)
+        if len(result["work"]) < 1 and len(result["education"]) < 1:
+            continue
         if result: break
     else:
         return None
