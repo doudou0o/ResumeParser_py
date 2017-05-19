@@ -4,21 +4,22 @@
 import re
 import logging
 
+from resume_parser.utils.GearmanUtils import hf_html_parse_api as htmltemplate_api
+from resume_parser.parsers import parser_five1
+
 logger = logging.getLogger("mylog")
 
-from resume_parser.utils.GearmanUtils import hf_html_parse_api as htmltemplate_api
-
 def parse(filename, filetext, fileori):
-    print "html parser"
+    logger.debug("html parser run a mission:%s" % filename)
 
     if not filename or not fileori or not filename.endswith("html"):
-        logger.debug("htmltemplate parser return null: filename is not satisfied")
+        logger.info("htmltemplate parser return null: filename is not satisfied or no fileori")
         return None
 
-    sids = taste_site(fileori)
+    sids = taste_site(fileori, filetext)
 
     if not sids:
-        logger.debug("htmltemplate parser return null: not any siteid found")
+        logger.info("htmltemplate parser return null: not any siteid found")
         return None
 
     for sid in sids:
@@ -27,12 +28,14 @@ def parse(filename, filetext, fileori):
             continue
         if result: break
     else:
+        logger.info("htmltemplate parser return null: no result from remote server")
         return None
 
     return revert_htmlret_to_result(result)
 
 def revert_htmlret_to_result(html_ret):
     # TODO
+    html_ret["parser_name"] = "hf_html_parse_api"
     return html_ret
 
 
@@ -47,9 +50,11 @@ def get_remote_htmltemplate_ret(fileori, sid):
     else:
         return None
 
-def taste_site(fileori):
+def taste_site(fileori, filetext):
     sites = []
     if len(re.findall("zhaopin\.(com|cn)", fileori)) > 3:
+        sites.append(SiteId.S_ZHAOPIN.value)
+    elif parser_five1.match(filetext):
         sites.append(SiteId.S_ZHAOPIN.value)
 
     if len(re.findall("51job\.com", fileori)) > 5 or len(re.findall("cid:", fileori)) > 8:
@@ -63,6 +68,9 @@ def taste_site(fileori):
 
     if len(re.findall("58\.com", fileori)) > 5:
         sites.append(SiteId.S_58TONGC.value)
+
+    if len(re.findall("lietou-edm", fileori)) > 5:
+        sites.append(SiteId.S_LIEPIN.value)
 
     return sites
 

@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from convert import getConvertFunc
+import logging
 
+from convert import getConvertFunc
 from resume_parser.parsers import get_parser
 from resume_parser.parsers import parsernames
+
+logger = logging.getLogger("mylog")
 
 def run(req):
     filename = req["filename"]
@@ -18,11 +21,12 @@ def run(req):
         if len(filetext) < 20:
             raise Exception("file text is too short!!")
 
-    filetext = clean_filetext(filetext) 
+    filetext = clean_filetext(filetext)
 
     parsers = (get_parser(t) for t in parsernames)
 
     results = map(lambda p: p.parse(filename,filetext,fileori), parsers)
+    logger.info("all parser is finished len(results):%d" % len(filter(lambda x:x is None,results)))
 
     final_result = merge_results(results)
 
@@ -72,12 +76,4 @@ def clean_filetext(filetext):
     return "\n".join(lines)
 
 
-if __name__ == '__main__':
-    import sys
-    filepath = sys.argv[1]
-    req={}
-    req["filename"] = filepath.split("/")[-1]
-    req["fileori"] = open(filepath).read()
-    req["filetext"] = ""
-    print run(req)
 

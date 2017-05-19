@@ -74,11 +74,13 @@ def divideExpBlock(text, isSplit=None):
     return blocks
 
 
-def print_HeadlineBlock(blocks):
+def text_HeadlineBlock(blocks):
+    text = []
     for block in blocks:
-        print block[0]
-        print "======="
-        print block[1]
+        text.append(str(block[0]))
+        text.append("=======")
+        text.append(block[1])
+    return "\n".join(text)
 
 
 def getNameByBid(bid):

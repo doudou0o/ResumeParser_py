@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from functools import partial
+import logging
 
 import parser_basic
 import templates
 
+logger = logging.getLogger("mylog")
 """
 51job parser
 the origin 51job parser
@@ -190,6 +192,8 @@ def parse(filename, filetext, fileori):
     # filename can used to parse or confirm name in resume
 
     for template in templates.get_parse_templates(pname):
+        logger.debug("parser:%s run a mission" % (pname+template.template_name))
+
         real_parser = partial(parser_basic.parse,
                         template.split_headline_block,
                         _get_parse_func_dict(template),
@@ -198,6 +202,7 @@ def parse(filename, filetext, fileori):
         resume_ret = real_parser(filetext)
 
         if len(resume_ret["work"]) < 1 and len(resume_ret["education"]) < 1:
+            logger.info("parser:%s miss all work and edu" % (pname+template.template_name))
             continue
 
         # get contact from basic
@@ -211,6 +216,7 @@ def parse(filename, filetext, fileori):
         # add resume name
         resume_ret["basic"]["resume_name"] = filename
 
+        logger.info("parser:%s passed and return one result" % (pname+template.template_name))
         return resume_ret
 
     return None
