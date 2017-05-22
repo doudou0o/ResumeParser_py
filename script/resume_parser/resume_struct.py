@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import copy
 
 def get_resume_struct(parser_name):
-    resume = resume_struct.copy()
+    resume = copy.deepcopy(resume_struct)
     resume["parser_name"] = parser_name
     return resume
 
@@ -28,6 +29,37 @@ def get_certificate_struct():
 def get_training_struct():
     return resume_train_struct.copy()
 
+def getStructByKey(kname):
+    if   kname == "education":
+        return resume_struct.get_education_struct()
+    elif kname == "work":
+        return resume_struct.get_emplyment_struct()
+    elif kname == "project":
+        return resume_struct.get_project_struct()
+    elif kname == "language":
+        return resume_struct.get_language_struct()
+    elif kname == "certificate":
+        return resume_struct.get_certificate_struct()
+    elif kname == "training":
+        return resume_struct.get_training_struct()
+    else:
+        raise Exception("no such key name:" + str(kname))
+
+def clean_result(ret):
+    resume = resume_struct.get_resume_struct("")
+    for key in resume:
+        if   type(resume[key]) == dict:
+            resume[key] = filter_json(ret[key], resume[key])
+        elif type(resume[key]) == list:
+            for v in ret[key]:
+                resume[key] = filter_json(v, getStructByKey(key))
+        else: resume[key] = ret.get(key, "")
+    return resume
+
+def filter_json(src, dst):
+    for k in dst:
+        dst[k] = src.get(k,"")
+    return dst
 
 
 # origin resume struct

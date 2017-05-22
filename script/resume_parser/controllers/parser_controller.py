@@ -6,6 +6,7 @@ import logging
 from convert import getConvertFunc
 from resume_parser.parsers import get_parser
 from resume_parser.parsers import parsernames
+from resume_parser import resume_struct
 
 logger = logging.getLogger("mylog")
 
@@ -29,6 +30,9 @@ def run(req):
     logger.info("all parser is finished len(results):%d" % len(filter(lambda x:x is None,results)))
 
     final_result = merge_results(results)
+
+    if "options" in req and "ret_type" in req["options"] and req["options"]["ret_type"] == "clean":
+        return resume_struct.clean_result(final_result)
 
     return final_result
 
@@ -74,6 +78,5 @@ def clean_filetext(filetext):
         else:
             lines.append(line)
     return "\n".join(lines)
-
 
 
