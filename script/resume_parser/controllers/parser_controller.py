@@ -31,10 +31,10 @@ def run(req):
 
     final_result = merge_results(results)
 
-    if "options" in req and "ret_type" in req["options"] and req["options"]["ret_type"] == "clean":
-        return resume_struct.clean_result(final_result)
+    if "options" in req and "ret_type" in req["options"] and req["options"]["ret_type"] == "all":
+        return final_result
 
-    return final_result
+    return resume_struct.clean_result(final_result)
 
 
 def merge_results(results):

@@ -20,7 +20,7 @@ ori = open(filepath).read()
 
 
 ## request
-options = {}
+options = {"ret_type": "all"}
 #options["ret_type"] = "clean"
 
 req={}

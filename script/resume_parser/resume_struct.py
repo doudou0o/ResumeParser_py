@@ -31,22 +31,22 @@ def get_training_struct():
 
 def getStructByKey(kname):
     if   kname == "education":
-        return resume_struct.get_education_struct()
+        return get_education_struct()
     elif kname == "work":
-        return resume_struct.get_emplyment_struct()
+        return get_emplyment_struct()
     elif kname == "project":
-        return resume_struct.get_project_struct()
+        return get_project_struct()
     elif kname == "language":
-        return resume_struct.get_language_struct()
+        return get_language_struct()
     elif kname == "certificate":
-        return resume_struct.get_certificate_struct()
+        return get_certificate_struct()
     elif kname == "training":
-        return resume_struct.get_training_struct()
+        return get_training_struct()
     else:
         raise Exception("no such key name:" + str(kname))
 
 def clean_result(ret):
-    resume = resume_struct.get_resume_struct("")
+    resume = get_resume_struct("")
     for key in resume:
         if   type(resume[key]) == dict:
             resume[key] = filter_json(ret[key], resume[key])
