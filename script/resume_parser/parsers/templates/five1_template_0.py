@@ -9,6 +9,7 @@ from resume_parser import divideModule
 from resume_parser.recognize import match_timestamp
 from resume_parser.recognize import match_degree
 from resume_parser.recognize import match_basic
+from resume_parser.recognize import match_region
 from resume_parser import resume_struct
 from resume_parser.utils import StringUtils
 
@@ -143,11 +144,11 @@ def extract_basicinfo(text):
         maccount = re.search(u"户口/国籍：(.+)", line)
         if maccount:
             basic_info["account_str"] = maccount.group(1).strip()
-            basic_info["account"] = match_basic.match_region(maccount.group(1).strip())
+            basic_info["account"] = match_region.match_region(maccount.group(1).strip())
         maddress = re.search(u"现居住?(.+?)(\||$)", line)
         if maddress:
             basic_info["address_str"] = maddress.group(1).strip()
-            basic_info["address"] = match_basic.match_region(maddress.group(1).strip())
+            basic_info["address"] = match_region.match_region(maddress.group(1).strip())
 
     return  basic_info
 
@@ -237,6 +238,7 @@ def extract_projectinfo(text):
             if m_proj:
                 timestamp = match_timestamp.match_timestamp_by_reg(project_reg, line)
                 project["name"] = m_proj.group("project").strip()
+                project["name"] = re.sub(u"已关联$", "", project["name"]).strip()
                 project["start_time"], project["end_time"], project["so_far"] = StringUtils.transform_timestamp(timestamp)
                 lastline = "project"
             pass

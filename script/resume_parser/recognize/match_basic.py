@@ -29,10 +29,6 @@ def match_email(text):
         return None
 
 
-def match_region(text):
-    # TODO
-    return ""
-
 
 def match_gender(text):
     if re.search(u"女", text):
