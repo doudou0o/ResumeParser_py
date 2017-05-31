@@ -1,0 +1,197 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""请求结构"""
+worker = "ecv_parser_new"
+req = {
+	"header":{ # 必须,非空!!
+		"uid":"2222", 
+	},
+	"request":{
+		"c":"resume_parse_module",
+		"m":"resume_parse",
+		"p":{
+			"filename":"",      # 文件名,必须,非空
+			"fileori":"",       # 文件原始内容,必须,非空
+			"filetext":"",      # 文件文本内容,必须,(暂时由于要整合html和pdf的文本提取所以可以为空)
+			
+			"options":{
+				"ret_type":"all", # 可选, 返回时格式调整("all":返回所有信息, "standard":返回标准信息)(不相关不要调整这个参数)
+			}
+
+		}
+	}
+
+}
+
+
+""" 临时信息
+所有基础默认值都为"" 无论int型还是str型的(除一些选择项，如性别)
+所有列表默认值都为一个空列表
+
+"""
+
+
+"""总体结构--详细信息"""
+parse_data = {
+        # 来源信息
+        "source":{
+            "src"           : 2,                # 简历来源(1：智联；2：51；3：猎聘；99：ifchange；100：人才库；101：伯乐内推) 默认为"" (这边解析不一定必须)
+            "src_no"        : ["27875124"],     # 简历外网ID，外网导入必填 默认为[""]
+            # 其他#TODO
+            #"user_id"       : "",       # 简历所属2C用户ID，用户填写时必填
+            #"is_merge"      : 1,        # 2C编辑时必填(1或true)
+            #"is_overwrite"  : 1,        # 企业购买时必填(1或true)
+            },
+        # 联系方式
+        "contact":{
+            "phone"     : "18888888888", # 手机号码
+            #"phone_area": 1,             # 手机号码归属地(1:国内; 2:国外)
+            "email": "user@ifchange.com",# 邮箱
+            "qq"        : "123456",      # QQ
+            "tel"       : "021-88888888",# 座机电话
+            "sina"      : "",            # 新浪微博
+            "ten"       : "",            # 腾讯微博
+            "msn"       : "",            # MSN
+            "wechat"    : "",            # 微信号
+            },
+        # 基本信息
+        "basic":{
+			"update_at"   : "2016-05-01 00:00:00",  # 简历更新时间 默认"0000-00-00 00:00:00"
+            "resume_name" : "51_job_resume.html",   # 简历名称 默认""
+            "name"        : "傻根",                 # 姓名
+            "gender"      : "U",                    # 性别(M：男；F：女；U：未知)
+            "birth"       : "2000年01月01日",       # 生日，格式为(yyyy年mm月dd日/yyyy年mm月/yyyy年)
+            "age"         : 26,                     # 年龄 默认值："" int
+            "marital"     : "U",                    # 婚姻状况(Y：已婚；N：未婚；U：未知)
+            "current_status" : "1",                 # int 当前状态(默认值0:; 1:离职，正在看机会; 2:在职，正在看机会; 3:在职，有好的机会可以考虑; 4:在职，不考虑机会;)
+            "work_experience"       : 3,            # 工作经验 单位 年 默认值：""
+            "address_province"      : "2",          # 现住地址(省)id   int 默认值 ""
+            "address"     : "105",                  # 现住地址id       int 默认值 ""
+            "account_province"      : "",           # 户口所在地(省)id int 默认值 ""
+            "account"               : "",           # 户口所在地id     int 默认值 ""
+            "card"                  : "123013...",  # 身份证号         str 默认值 ""
+			"expect_work_at"        : "", 			# 期望到岗时间。   str 默认值：""。
+            "expect_industry_name"  : "计算机软件", # 期望从事行业  多个按照 ,半角逗号分割
+            "expect_position_name"  : "",           # 期望从事职位(仅有一个)
+            "expect_city_ids"       : "",           # 期望工作地点id,半角逗号分割
+            "expect_city_names"     : "",           # 期望工作地点,半角逗号分割
+            "expect_salary_from"    : 20.00,        # 期望月薪最小值(单位K)  float 默认 0 格式 10.00 薪资以下都按此格式
+            "expect_salary_to"      : "",           # 期望月薪最大值(单位K)
+            "expect_salary_month"   : "",           # 期望薪资月数   int 默认值 ""
+            "expect_annual_salary_from" : "",       # 期望年薪最小   int 默认值 ""
+			"expect_annual_salary_to"   : "",       # 期望年薪最大   int 默认值 ""
+			"basic_salary_from"     : "",           # 当前月薪最小值
+            "basic_salary_to"       : "",           # 当前月薪最大值
+            "basic_salary_month"    : "",	     	# 当前月薪数
+            "self_remark"           : "",           # 自我评价
+            # 其他(与解析无关)
+            "degree"      			: "4",          # 学历 默认值："" int			
+			"id"          			: "",           # 简历ID (应当同src_no , 但解析保留空)
+            "is_validate" 			: "U",          # 联系方式是否有效(Y：有效；N：无效；U：未知)			
+            "is_fertility"          : "",           # 是否已育(Y：已育；N：未育；U：未知)
+            "is_house"              : "",           # 居住地是否有住房(Y：有住房；N：没有住房；U：未知)
+            "live_family"           : "",           # 是否与家人同住(Y：同住；N：不同住；U：未知)
+            "interests"             : "",           # 兴趣
+            "focused_corporations"  : [],           # 关注的公司，默认数组
+            "focused_feelings"      : [],           # 关注的点，默认数组
+            "overseas"              : "N",          # 是否有海外经历(Y：有；N：没有) 默认值: "N"
+            "political_status"      : "党员",       # 政治面貌 默认""
+            "expect_type"           : "",           # 期望工作性质
+            "expect_bonus"          : "",           # 期望其他收入(单位K)
+            "project_info"          : "",           # 项目经历  如果项目经历无法解析 则填充该字段   放other_info里
+            "other_info"            : "",           # 其他信息
+            "not_expect_corporation_name"   : "",   # 勿推荐企业(SON字符串)
+            "not_expect_corporation_ids"    : "",   # 勿推荐企业ID列表(SON字符串)
+            "not_expect_corporation_status" : "",   # 勿推荐企业开关（0:可以被企业搜索到;1:不能被企业搜索到;）
+            "photo"                 : "",           # 图像
+            },
+        # 工作经历 数组形式
+        "work":[
+            {   "corporation_name"  : "上海逸橙",   # 公司名
+                "start_time"        : "2016年02月01日", # 开始时间(yyyy年mm月dd日/yyyy年mm月/yyyy年)
+                "end_time"          : "2016年05月01日", # 结束时间
+                "so_far"            : "N",          # 是否至今(是：Y；否：N；)
+                "corporation_desc"  : "",           # 公司描述
+                "corporation_type"  : "",           # 公司性质
+                "position_name"     : "",           # 职位
+                "responsibilities"  : "",           # 职责
+                "architecture_name" : "",           # 部门
+                "scale"             : "",           # 规模  str
+                "industry_name"     : "",           # 行业 #ADD
+                "reporting_to"      : "老板",           # 汇报对象
+                "subordinates_count": 0,            # 下属人数 类型 int 默认: 0
+                "responsibilities"  : "",           # 职责
+                "salary_month"      : "",           # 薪资月数
+                "basic_salary_from" : 1000.00,      # 当前薪资最小值(单位K)
+                "basic_salary_to"   : "",           # 当前薪资最大值(单位K)
+                "salary_month"      : "",           # 薪资月数
+                "annual_salary_from": "",           # 年薪最小值(单位K)
+                "annual_salary_to"  : "",           # 年薪最大值(单位K)
+                "management_experience" : "N",      # 是否有管理经验(Y：有；N：无) 默认值:"N"
+                 #其他
+                "station_name"      : "",           # 岗位类别
+                "bonus"             : "",           # 其他收入(单位K)
+                "city"              : "",           # 工作地点
+            },
+            ],
+        # 教育经历 数组形式
+        "education":[
+            {   "school_name"       : "",           # 学校名
+                "start_time"        : "",           # 开始时间(yyyy年mm月dd日/yyyy年mm月/yyyy年)
+                "end_time"          : "",           # 结束时间
+                "so_far"            : "N",          # 是否至今(是：Y；否：N；)
+                "discipline_name"   : "",           # 专业
+                "degree"            : 2,            # 学历 int 默认""
+                 # 其他
+                "discipline_desc"   : "",           # 专业描述
+                "is_entrance"       : "",           # 是否统招
+            },
+            ],
+        # 项目经历 数组形式
+        "project":[
+            {   "name"              : "",           # 项目名称
+                "start_time"        : "",           # 开始时间(yyyy年mm月dd日/yyyy年mm月/yyyy年)
+                "end_time"          : "",           # 结束时间
+                "so_far"            : "N",          # 是否至今(是：Y；否：N；)
+                "describe"          : "",           # 项目描述
+                "responsibilities"  : "",           # 职责描述
+                "achivement"        : "",           # 工作业绩
+                "corporation_name"  : "",           # 公司名
+                "position_name"     : "",           # 职位名
+                 # 其他
+                "soft_env"          : "",           # 软件环境
+                "hard_env"          : "",           # 硬件环境
+                "develop_tool"      : "",           # 开发工具
+            },
+            ],
+        # 语言
+        "language":[
+            {   "name"              : "",           # 语言类别 必填
+                "level"             : "",           # 掌握程度
+                "certificate"       : "",           # 证书
+            }
+            ],
+        # 证书
+        "certificate":[
+            {   "name"              : "",           # 证书名称，必填
+                "start_time"        : "",           # 获得时间
+                "description"       : "",           # 证书描述
+            },
+            ],
+        # 培训经历
+        "training":[
+            {   "name"              : "",           # 培训课程
+                "start_time"        : "",           # 获得时间
+                "end_time"          : "",           # 结束时间
+                "so_far"            : "N",          # 是否至今(是：Y；否：N；)
+                "city"              : "",           # 培训地点
+                "certificate"       : "",           # 获得证书
+                "authority"         : "",           # 培训机构
+                "description"       : "",           # 详细描述
+            },
+            ],
+
+
+}
+
+
