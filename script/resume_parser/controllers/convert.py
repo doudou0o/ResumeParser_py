@@ -2,7 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import jpype
+import os
 import html2text as html2text
+
+jarPath = os.path.join(os.path.dirname(__file__), "../thirdlibs/convert.jar")
+
+def initJVM():
+    jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path="+jarPath)
+    pdfconvertClass = jpype.JClass("com.echeng.convector.pdfconvector.pdf2text")
+    pdfconvertObj   = pdfconvertClass()
+    return pdfconvertObj
+pdfconvertObj = initJVM()
 
 def getConvertFunc(fileext):
     """
@@ -44,24 +54,25 @@ def convert_text(fileori):
         pass
     raise Exception("text convert can not decode file")
 
-def convert_pdf(fileori):
+def convert_pdf(fileori, restart=True):
     """
     itype: fileori: bytes
     rtype: unicode
     """
-    # TODO
+    global pdfconvertObj
     try:
-        jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path=thirdlib/convector_runnable.jar")
-        pdfconvertClass = jpype.JClass("com.echeng.convector.pdfconvector.pdf2text")
-        pdfconvertObj   = pdfconvertClass()
         return pdfconvertObj.convert(fileori)
-        jpype.shutdownJVM()
-        pass
     except:
         jpype.shutdownJVM()
-        raise Exception("pdf convert was break down")
+        pdfconvertObj = initJVM()
+        if restart:
+            return convert_pdf(fileori, False)
+        else:
+            raise Exception("pdf convert was break down")
+            return None
 
 
 if __name__ == '__main__':
-    fileori = open("thirdlib/1.pdf").read()
+    import sys; filepath = sys.argv[1]
+    fileori = open(filepath).read()
     print convert_pdf(fileori)

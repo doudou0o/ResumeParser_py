@@ -55,8 +55,8 @@ def getErrmsgByReq(req):
     """
     if "filename" not in req:
         return "no filename item in req"
-    if "filetext" not in req or not req["filetext"]:
-        return "no filetext item in req"
+    #if "filetext" not in req or not req["filetext"]:
+    #    return "no filetext item in req"
     if "fileori" not in req:
         return "no fileori item in req"
 
