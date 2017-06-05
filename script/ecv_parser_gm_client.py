@@ -39,7 +39,7 @@ def buildReq():
             }
 
     req["request"]["p"]["filename"] = sys.argv[1]
-    req["request"]["p"]["filetext"] = open(sys.argv[1], "r").read().decode("utf8")
+    req["request"]["p"]["filetext"] = ""
     req["request"]["p"]["fileori"] = open(sys.argv[1], "r").read().decode("utf8")
 
     return req

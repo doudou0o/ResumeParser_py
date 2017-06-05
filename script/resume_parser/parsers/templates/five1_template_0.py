@@ -117,8 +117,11 @@ def extract_basicinfo(text):
     lines = text.split('\n')
     for line_pre, line in izip([""]+lines, lines):
         ## name update
-        if re.search(u"(.+)\s*流程状态.+标签.+", line):
-            basic_info["name"] = re.search(u"(.+)\s*流程状态", line).group(1).strip()
+        if re.search(u"(.+)\s*流程状态.+标签.+", line) or re.search(u"(.+)\s*ID:\d+", line):
+            if u"流程状态" in line:
+                basic_info["name"] = re.search(u"(.+)\s*流程状态", line).group(1).strip()
+            else:
+                basic_info["name"] = re.search(u"(.+)\s*ID", line).group(1).strip()
             if line_pre.strip().startswith(u"更新时间："):
                 m = re.search("\d{4}-\d{2}-\d{2}", line_pre)
                 if m: basic_info["updated_at"]=m.group()
