@@ -2,7 +2,7 @@
 
 echo "working path: "$(cd `dirname $0`; pwd)
 
-servername="ecv_parser_gm_server.py"
+servername="resume_parser_gm_server.py"
 
 pids=`ps aux | grep "$servername" | grep -v "grep" | awk '{print $2}' `
 
@@ -27,5 +27,5 @@ sleep 1
 kill -9 ${pids_l[0]}
 
 echo "start server..."
-nohup python ecv_parser_gm_server.py >> ../log/nohuo.out &
+nohup python resume_parser_gm_server.py >> ../log/nohuo.out &
 echo "enjoy it"

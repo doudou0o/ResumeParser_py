@@ -52,7 +52,7 @@ print u"手机:%s\t电话:%s\n" % (ans["contact"]["phone"],ans["contact"]["tel"]
 
 print u"期望地点:%s" % ans["basic"]["expect_city_names"]
 print u"期望职位:%s" % ans["basic"]["expect_position_name"]
-print u"期望月薪:%d-%d" % (ans["basic"]["expect_salary_from"], ans["basic"]["expect_salary_to"])
+print u"期望月薪:%s-%s" % (str(ans["basic"]["expect_salary_from"]), str(ans["basic"]["expect_salary_to"]))
 
 print u"\n个人评价:"
 print ans["basic"]["self_remark"]

@@ -6,8 +6,8 @@ import logging
 import traceback
 import sys
 
-import ecv_parser_gm_helper as helper
-from ecv_parser_gm_helper import err_no
+import resume_parser_gm_helper as helper
+from resume_parser_gm_helper import err_no
 
 import resume_parser.controllers as controllers
 
