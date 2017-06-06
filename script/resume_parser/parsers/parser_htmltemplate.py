@@ -24,7 +24,7 @@ def parse(filename, filetext, fileori):
 
     for sid in sids:
         result = get_remote_htmltemplate_ret(fileori, sid)
-        if len(result["work"]) < 1 and len(result["education"]) < 1:
+        if result and len(result["work"]) < 1 and len(result["education"]) < 1:
             continue
         if result: break
     else:
@@ -40,13 +40,14 @@ def revert_htmlret_to_result(html_ret):
 
 
 def get_remote_htmltemplate_ret(fileori, sid):
-    gm_response = htmltemplate_api(fileori, sid)
     try:
+        gm_response = htmltemplate_api(fileori, sid)
         if gm_response["response"]["err_no"] == 0:
             result = gm_response["response"]["results"]
             if result: return result
-    except:
-        pass
+    except Exception as e:
+        logger.error("remote htmltemplate has raise some exceptions" + e.message)
+        return None
     else:
         return None
 

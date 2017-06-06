@@ -41,7 +41,8 @@ else:
             indent=4, separators=(',', ': '))
 
 print "*************************************"
-print ans["parser_name"]
+print "final parser name: "+ans["parser_name"]
+print "and ori_block_text"
 print "*************************************"
 print ans["ori_block_text"]
 

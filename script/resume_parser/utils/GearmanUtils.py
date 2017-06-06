@@ -6,9 +6,10 @@ import msgpack
 import json
 
 from CommonUtils import client_worker
+from CommonUtils import timeout
 
 
-
+@timeout(5)
 def hf_html_parse_api(fileori, siteId):
     workername = "grab_basic"
     packType = "msgpack"
