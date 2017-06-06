@@ -2,5 +2,5 @@
 # -*- coding: utf-8 -*-
 
 def parse(filename, filetext, fileori):
-    print "zhilian"
+    #print "zhilian"
     return None

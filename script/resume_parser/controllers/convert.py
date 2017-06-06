@@ -8,10 +8,12 @@ import html2text as html2text
 jarPath = os.path.join(os.path.dirname(__file__), "../thirdlibs/convert.jar")
 
 def initJVM():
-    jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path="+jarPath)
+    if not jpype.isJVMStarted():
+        jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path="+jarPath)
     pdfconvertClass = jpype.JClass("com.echeng.convector.pdfconvector.pdf2text")
     pdfconvertObj   = pdfconvertClass()
     return pdfconvertObj
+
 
 def getConvertFunc(fileext):
     """
@@ -25,7 +27,7 @@ def getConvertFunc(fileext):
     elif fileext == "html":
         return convert_html
     else:
-        raise Exception("unknown file extention input")
+        raise Exception("unknown file extention input:%s" % fileext)
 
 def convert_html(fileori):
     """
@@ -58,15 +60,12 @@ def convert_pdf(fileori, restart=True):
     itype: fileori: bytes
     rtype: unicode
     """
+
     try:
-        jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path="+jarPath)
-        pdfconvertClass = jpype.JClass("com.echeng.convector.pdfconvector.pdf2text")
-        pdfconvertObj   = pdfconvertClass()
+        pdfconvertObj = initJVM()
         filetext = pdfconvertObj.convert(fileori)
-        jpype.shutdownJVM()
         return filetext
     except:
-        jpype.shutdownJVM()
         if restart:
             return convert_pdf(fileori, False)
         else:

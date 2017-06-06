@@ -48,7 +48,7 @@ def task_callback(GearmanWorker, job):
     except:
         tb = traceback.format_exc()
         logger.error("the req:%s happened exception:\n,%s" % (header, tb))
-        return helper.pack_gmresponse(helper.assemble_response(header, err_no.ERROR_6, tb, result), packType)
+        return helper.pack_gmresponse(helper.assemble_response(header, err_no.ERROR_6, tb, None), packType)
 
     if not result:
         return helper.pack_gmresponse(helper.assemble_response(header, err_no.ERROR_7, "", result), packType)

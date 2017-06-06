@@ -173,7 +173,7 @@ def extract_expectinfo(text):
     expectinfo = {}
     selfremark = False
     for line in text.split("\n"):
-        mloc = re.search(u"^地点：(.+)$", line)
+        mloc = re.search(u"地点：(.+)$", line)
         if mloc:
             expectinfo["expect_city_names"] = re.sub(u"[\u2003 ]", ",", mloc.group(1).strip()).strip()
         mpos = re.search(u"^职能：(.+)$", line)
