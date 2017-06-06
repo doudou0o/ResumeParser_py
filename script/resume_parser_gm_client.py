@@ -40,7 +40,10 @@ def buildReq():
 
     req["request"]["p"]["filename"] = sys.argv[1]
     req["request"]["p"]["filetext"] = ""
-    req["request"]["p"]["fileori"] = open(sys.argv[1], "r").read().decode("utf8")
+    try:
+        req["request"]["p"]["fileori"] = open(sys.argv[1], "r").read().decode("utf8")
+    except:
+        req["request"]["p"]["fileori"] = open(sys.argv[1], "r").read()
 
     return req
 

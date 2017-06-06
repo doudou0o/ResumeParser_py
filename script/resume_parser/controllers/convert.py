@@ -12,7 +12,6 @@ def initJVM():
     pdfconvertClass = jpype.JClass("com.echeng.convector.pdfconvector.pdf2text")
     pdfconvertObj   = pdfconvertClass()
     return pdfconvertObj
-pdfconvertObj = initJVM()
 
 def getConvertFunc(fileext):
     """
@@ -59,17 +58,19 @@ def convert_pdf(fileori, restart=True):
     itype: fileori: bytes
     rtype: unicode
     """
-    global pdfconvertObj
     try:
-        return pdfconvertObj.convert(fileori)
+        jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path="+jarPath)
+        pdfconvertClass = jpype.JClass("com.echeng.convector.pdfconvector.pdf2text")
+        pdfconvertObj   = pdfconvertClass()
+        filetext = pdfconvertObj.convert(fileori)
+        jpype.shutdownJVM()
+        return filetext
     except:
         jpype.shutdownJVM()
-        pdfconvertObj = initJVM()
         if restart:
             return convert_pdf(fileori, False)
         else:
             raise Exception("pdf convert was break down")
-            return None
 
 
 if __name__ == '__main__':
