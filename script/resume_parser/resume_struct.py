@@ -52,7 +52,7 @@ def clean_result(ret):
             resume[key] = filter_json(ret[key], resume[key])
         elif type(resume[key]) == list:
             for v in ret[key]:
-                resume[key] = filter_json(v, getStructByKey(key))
+                resume[key].append(filter_json(v, getStructByKey(key)))
         else: resume[key] = ret.get(key, "")
     return resume
 

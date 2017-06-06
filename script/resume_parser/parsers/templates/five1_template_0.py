@@ -135,8 +135,8 @@ def extract_basicinfo(text):
             basic_info["gender"] = match_basic.match_gender(line)
         mage = re.search(u"\d+岁", line)
         if mage: basic_info["age"] = int(mage.group()[:-1])
-        mbirth = re.search(u"\d{4}年\d{1,2}月\d{1,2}日", line)
-        if mbirth and mage: basic_info["birth"] = mbirth.group()
+        mbirth = re.search(u"\d{4}年\s?\d{1,2}月\s?\d{1,2}日", line)
+        if mbirth and mage: basic_info["birth"] = mbirth.group().replace(" ", "")
         ## others
         mtel = re.search(u"家庭电话：(.+)", line)
         if mtel: basic_info["contact_tel"] = mtel.group(1).strip()

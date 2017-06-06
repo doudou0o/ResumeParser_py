@@ -48,7 +48,7 @@ def buildReq():
     return req
 
 def run():
-    WORKERNAME = "resume_parser_module"
+    WORKERNAME = "resume_parser"
     HOST = "192.168.1.111"
     POST = "4730"
 

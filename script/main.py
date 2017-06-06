@@ -20,8 +20,8 @@ ori = open(filepath).read()
 
 
 ## request
-options = {"ret_type": "all"}
-#options["ret_type"] = "clean"
+#options = {"ret_type": "all"}
+options = {"ret_type": "clean"}
 
 req={}
 req["filename"] = filepath.split('/')[-1].decode("utf8")
@@ -44,12 +44,12 @@ print "*************************************"
 print "final parser name: "+ans["parser_name"]
 print "and ori_block_text"
 print "*************************************"
-print ans["ori_block_text"]
+print ans["ori_block_text"] if "ori_block_text" in ans else ""
 
 
 print "*************************************"
 print u"姓名:%s\t年龄:%d\t性别:%s" % (ans["basic"]["name"],ans["basic"]["age"],ans["basic"]["gender"])
-print u"手机:%s\t电话:%s\n" % (ans["contact"]["phone"],ans["contact"]["tel"])
+print u"手机:%s\t生日:%s\n" % (ans["contact"]["phone"],ans["basic"]["birth"])
 
 print u"期望地点:%s" % ans["basic"]["expect_city_names"]
 print u"期望职位:%s" % ans["basic"]["expect_position_name"]
