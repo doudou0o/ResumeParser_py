@@ -46,11 +46,12 @@ def getStructByKey(kname):
         raise Exception("no such key name:" + str(kname))
 
 def clean_result(ret):
+    if not ret: return None
     resume = get_resume_struct("")
     for key in resume:
-        if   type(resume[key]) == dict:
+        if   type(resume[key]) == dict and key in ret:
             resume[key] = filter_json(ret[key], resume[key])
-        elif type(resume[key]) == list:
+        elif type(resume[key]) == list and key in ret:
             for v in ret[key]:
                 resume[key].append(filter_json(v, getStructByKey(key)))
         else: resume[key] = ret.get(key, "")

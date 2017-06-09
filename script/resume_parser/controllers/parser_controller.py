@@ -27,7 +27,7 @@ def run(req):
     parsers = (get_parser(t) for t in parsernames)
 
     results = map(lambda p: p.parse(filename,filetext,fileori), parsers)
-    logger.info("all parser is finished len(results):%d" % len(filter(lambda x:x is None,results)))
+    logger.info("all parser is finished len(results):%d" % len(filter(lambda x:x is not None,results)))
 
     final_result = merge_results(results)
 

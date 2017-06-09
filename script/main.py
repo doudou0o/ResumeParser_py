@@ -20,8 +20,8 @@ ori = open(filepath).read()
 
 
 ## request
-#options = {"ret_type": "all"}
-options = {"ret_type": "clean"}
+options = {"ret_type": "all"}
+#options = {"ret_type": "clean"}
 
 req={}
 req["filename"] = filepath.split('/')[-1].decode("utf8")

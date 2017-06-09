@@ -11,6 +11,8 @@ logger = logging.getLogger("mylog")
 
 def parse(filename, filetext, fileori):
     logger.debug("html parser run a mission:%s" % filename)
+    logger.info("htmltemplate parser return null: it is templary closed")
+    return None
 
     if not filename or not fileori or not filename.endswith("html"):
         logger.info("htmltemplate parser return null: filename is not satisfied or no fileori")
@@ -58,7 +60,8 @@ def taste_site(fileori, filetext):
     elif parser_five1.match(filetext):
         sites.append(SiteId.S_ZHAOPIN.value)
 
-    if len(re.findall("51job\.com", fileori)) > 5 or len(re.findall("cid:", fileori)) > 8:
+    if len(re.findall("51job\.com", fileori)) > 5 or\
+            len(re.findall("cid:", fileori)) > 8 or len(re.findall("51jobcdn", fileori)) > 5:
         sites.append(SiteId.S_FIVE1.value)
 
     if len(re.findall("dajieimg\.com", fileori)) > 5:

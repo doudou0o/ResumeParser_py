@@ -43,6 +43,8 @@ def _parse_education_info(split_eduexp_block, extract_eduinfo, text):
     exp_blocks = split_eduexp_block(text)
     for exp in exp_blocks:
         edu_info = extract_eduinfo(exp)
+        if "school_name" not in edu_info or not edu_info["school_name"]:
+            continue
         # judge
         # TODO
         edu_info_list.append(edu_info)
@@ -60,6 +62,8 @@ def _parse_employment_info(split_workexp_block, extract_workinfo, text):
     exp_blocks = split_workexp_block(text)
     for exp in exp_blocks:
         work_info = extract_workinfo(exp)
+        if "corporation_name" not in work_info or not work_info["corporation_name"]:
+            continue
         # judge
         # TODO
         work_info_list.append(work_info)
@@ -77,6 +81,8 @@ def _parse_project_info(split_project_block, extract_projectinfo, text):
     exp_blocks = split_project_block(text)
     for exp in exp_blocks:
         proj_info = extract_projectinfo(exp)
+        if "name" not in proj_info or not proj_info["name"]:
+            continue
         # judge
         # TODO
         project_info_list.append(proj_info)
