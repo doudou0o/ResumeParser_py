@@ -7,7 +7,7 @@ from itertools import izip
 
 from resume_parser import divideModule
 from resume_parser.recognize import match_timestamp
-from resume_parser.recognize import match_degree
+from resume_parser.recognize import match_education
 from resume_parser.recognize import match_basic
 from resume_parser.recognize import match_region
 from resume_parser import resume_struct
@@ -93,12 +93,12 @@ def extract_eduinfo(expblock):
         elif lastline == "school":
             items = line.split("|")
             if len(items) >= 2:
-                edu["degree"] = match_degree.match_degree(items[0], 99)
+                edu["degree"] = match_education.match_degree(items[0], 99)
                 edu["degree_ori"] = items[0].strip()
                 edu["discipline_name"] = items[1].strip()
             else:
-                if match_degree.match_degree(items):
-                    edu["degree"] = match_degree.match_degree(items[0])
+                if match_education.match_degree(items):
+                    edu["degree"] = match_education.match_degree(items[0])
                     edu["degree_ori"] = items[0].strip()
                 else:
                     edu["discipline_name"] = items[0].strip()
@@ -178,7 +178,7 @@ def extract_expectinfo(text):
         mloc = re.search(u"地点：(.+)$", line)
         if mloc:
             expectinfo["expect_city_names"] = re.sub(u"[\u2003 ]", ",", mloc.group(1).strip()).strip()
-        mpos = re.search(u"^职能：(.+)$", line)
+        mpos = re.search(u"^职能：(.+?)\s*(行业|$)", line)
         if mpos:
             expectinfo["expect_position_name"] = re.sub(u"[\u2003 ]", ",", mpos.group(1).strip()).strip()
         mindus = re.search(u"^行业：(.+)$", line)

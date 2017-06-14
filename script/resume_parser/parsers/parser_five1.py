@@ -6,6 +6,7 @@ import logging
 
 import parser_basic
 import templates
+from resume_parser import divideModule
 
 logger = logging.getLogger("mylog")
 """
@@ -206,6 +207,16 @@ def parse(filename, filetext, fileori):
                         pname+template.template_name)
         # go go go
         resume_ret = real_parser(filetext)
+
+        if len(resume_ret["work"]) < 1 and \
+                len(divideModule.getBlockByid(resume_ret["ori_block_text"], 4).split("\n"))>5:
+            logger.info("parser:%s miss work" % (pname+template.template_name))
+            continue
+
+        if len(resume_ret["education"]) < 1 and \
+                len(divideModule.getBlockByid(resume_ret["ori_block_text"], 5).split("\n"))>5:
+            logger.info("parser:%s miss edu" % (pname+template.template_name))
+            continue
 
         if len(resume_ret["work"]) < 1 and len(resume_ret["education"]) < 1:
             logger.info("parser:%s miss all work and edu" % (pname+template.template_name))

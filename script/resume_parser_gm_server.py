@@ -21,7 +21,7 @@ def task_callback(GearmanWorker, job):
     if not req_dict:
         return helper.pack_gmresponse(helper.assemble_response(None, err_no.ERROR_1, "", None), packType)
 
-    logger.info("##### received request: %s" % str(req_dict))
+    logger.info("##### received request: %s" % str(req_dict)[:9999])
 
     # preprocess request
     head_err_msg =  helper.check_header(req_dict)

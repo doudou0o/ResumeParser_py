@@ -3,11 +3,20 @@
 
 from resume_parser.utils import StringUtils
 
+"""
+this module is match item about education
+such as: match_degree; match_school; match_discipline
+"""
 
 degree_dict={}
 degree_list=[ 94,95, 6,4,3,2,1, 92,91,90,89,87,86, 99]
 
 def match_degree(text, default=None):
+    """
+    itype: text unicode
+    itype: default: if its confirmed degree, then default should be 99
+    rtype: degree: int
+    """
     text = _clean_text(text)
     for i in degree_list:
         for deg in degree_dict[i]:
@@ -16,6 +25,21 @@ def match_degree(text, default=None):
             else:
                 return i
     return default
+
+def match_school(text):
+    """
+    itype: text unicode
+    rtype: school_name
+    """
+    pass
+
+def match_discipline(text):
+    """
+    itype: text unicode
+    rtype: discipline_name
+    """
+    pass
+
 
 def _clean_text(text):
     text = StringUtils.removeShapesSymbols(text)

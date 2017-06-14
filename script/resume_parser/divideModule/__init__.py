@@ -86,6 +86,24 @@ def text_HeadlineBlock(blocks):
 def getNameByBid(bid):
     return bid_name_dict.get(bid, "unknow")
 
+def getBlockByid(blocked_text, bid):
+    """
+    itype: blocked_text unicode
+    itype: bid int
+    rtype: block unicode
+    """
+    isStart,block = False, []
+    lines = blocked_text.split('\n')
+    for i,line in enumerate(lines):
+        if line == "[%d]"%bid:
+            if i+1<len(lines) and lines[i+1] == "=======":
+                isStart = not isStart
+        if isStart:
+            block.append(line)
+    return "\n".join(block)
+
+
+
 
 def init_readconf():
     conf_file_path = os.path.join(os.path.dirname(__file__),"headlines_dict.conf")

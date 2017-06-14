@@ -7,6 +7,7 @@ import logging.config
 import gearman
 import msgpack
 import json
+import copy
 
 logger = logging.getLogger("mylog")
 
@@ -70,8 +71,12 @@ def getCMPByReq(req_dict):
 
 
 def assemble_response(header, ERR, err_msg, results):
-    err_msg = ERR.value[1]+": "+err_msg
-    err_no  = ERR.value[0]
+    if type(ERR) == tuple:
+        err_msg = ERR[1]+":"+err_msg
+        err_no  = ERR[0]
+    else:
+        err_msg = ERR.value[1]+": "+err_msg
+        err_no  = ERR.value[0]
 
     response = {}
     response["err_no"] = err_no
