@@ -37,15 +37,17 @@ def divideHeadlineBlock(text, headlines={}, isOnly=False):
 
 
     blocks = []
+    def nextline(i, lines):
+        return lines[i+1] if i+1<len(lines) else ""
 
     lines_clean = map(_clean_cand_headline, text.split("\n") )
     lines = text.split("\n")
     for i in xrange(len(lines)):
         if i == 0:
-            h = _isHeadline("", lines_clean[i], headlines_dict)
+            h = _isHeadline("", lines_clean[i], nextline(i,lines), headlines_dict)
             blocks.append([h if h else [99], lines[i]])
             continue
-        h = _isHeadline(lines_clean[i-1], lines_clean[i], headlines_dict)
+        h = _isHeadline(lines_clean[i-1], lines_clean[i], nextline(i,lines), headlines_dict)
         if h:
             blocks.append([h, lines[i]])
         else:
@@ -125,17 +127,23 @@ def init_readconf():
     return global_headline, bid_name_dict
 
 
-def _isHeadline(preline, line, headlines_dict):
+def _isHeadline(preline, line, nextline, headlines_dict):
+    if line == "":
+        return None
+
     if re.search(u"(所属行业)|(行业类别)", preline):
         return None
 
+    if _isHeadline(line, nextline, "", headlines_dict):
+        return None
+ 
     if line in headlines_dict:
         return [headlines_dict[line]]
 
     if '/' in line:
         ret = []
         for l in line.split('/'):
-            h = _isHeadline(preline, l, headlines_dict)
+            h = _isHeadline(preline, l, "", headlines_dict)
             if h: ret.extend(h)
         return ret if ret else None
 
