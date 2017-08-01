@@ -110,7 +110,7 @@ def parse(filename, filetext, fileori):
 def match(filetext):
     # TODO
     # 4 templary, this function is directly invoke parse()
-    return parse is None
+    return parse("tempname_for_match", filetext, "" ) is None
 
 
 

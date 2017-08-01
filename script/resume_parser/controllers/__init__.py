@@ -4,7 +4,7 @@
 import os
 import sys
 dirpath = os.path.dirname(__file__)
-deppath = os.path.join(dirpath, "../../../thirdlib")
+deppath = os.path.join(dirpath, "../thirdlibs")
 sys.path.append(deppath)
 
 
