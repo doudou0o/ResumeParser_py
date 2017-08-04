@@ -4,6 +4,7 @@
 import logging
 
 from convert import getConvertFunc
+from k18 import get_filetext_from_k18
 from resume_parser.parsers import get_parser
 from resume_parser.parsers import parsernames
 from resume_parser import resume_struct
@@ -19,7 +20,10 @@ def run(req):
     if not filetext:
         convert = getConvertFunc(filename.split(".")[-1])
         filetext = convert(fileori)
-        if len(filetext) < 20:
+        if filetext is None or len(filetext) < 20:
+            logger.warning("file text cannot got, get from k18 next")
+            filetext = get_filetext_from_k18(fileori)
+        if filetext is None or len(filetext) < 20:
             raise Exception("file text is too short!!")
 
     filetext = clean_filetext(filetext)

@@ -32,12 +32,14 @@ def getConvertFunc(fileext):
         return convert_text
     elif fileext == "pdf":
         return convert_pdf
-    elif fileext == "html":
+    elif fileext == "html" or fileext == "htm":
         return convert_html
     elif fileext == "docx":
         return convert_docx
     elif fileext == "mht":
         return convert_mht
+    elif fileext == "doc":
+        return convert_doc
     else:
         raise Exception("unknown file extention input:%s" % fileext)
 
@@ -133,6 +135,15 @@ def convert_pdf(fileori, restart=True):
         else:
             raise Exception("pdf convert was break down")
 
+def convert_doc(fileori):
+    if re.search("Content-Type:\s*multipart/related;",fileori) and \
+            re.search("(This is a multi-part message in MIME format.)|(boundary)",fileori):
+        # its a mht file
+        return convert_mht(fileori)
+    elif re.search("<html", fileori) and re.search("</html>", fileori):
+        # its a html file
+        return convert_html(fileori)
+    return None
 
 if __name__ == '__main__':
     import sys; filepath = sys.argv[1]

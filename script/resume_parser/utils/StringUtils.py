@@ -35,6 +35,8 @@ def gen_en_cn_split(txt):
 def is_cn_chr(c):
     return True if re.search(u"[\u4e00-\u9fa5]",c) else False
 
+def is_en_chr(c):
+    return True if re.search(u"[a-zA-Z]", c) else False
 
 def removeShapesSymbols(text):
     shapes  = re.compile(u"[\u25A0-\u25FF]")
@@ -75,6 +77,20 @@ def removeChSpace(text):
     return text
 
 
+def get_words(text):
+    words = []
+    tmp = ""
+    for ch in text:
+        if is_cn_chr(ch):
+            if len(tmp)>0:
+                words.append(tmp);tmp=""
+            words.append(ch)
+        elif not is_en_chr(ch) and len(tmp)>0:
+            words.append(tmp);tmp=""
+        else:
+            tmp += ch
+    if len(tmp)>0:words.append(tmp);tmp=""
+    return words
 
 
 
