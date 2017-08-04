@@ -153,7 +153,7 @@ def _isHeadline(preline, line, nextline, headlines_dict):
     return None
 
 def _split_enResume_block(block):
-    blocks = [block[0], block[1]]
+    blocks = [[block[0], block[1]],]
     text_lines = block[1].split("\n")
     for i, line in enumerate(text_lines):
         if len(text_lines) - i < 10: break
