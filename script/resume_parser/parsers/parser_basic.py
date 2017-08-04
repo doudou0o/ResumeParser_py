@@ -180,3 +180,20 @@ def parse_certificate_info(split_certificate_block, extract_certinfo, text):
     pass
     return certi_info_list
 
+def parse_skill_info(split_skill_block, extract_skillinfo, text):
+    """
+    itype: split_skill_block: function
+    itype: extract_skillinfo: function
+    itype: text unicode
+    rtype: skill struct
+    """
+    skill_info_list = []
+    exp_blocks = split_skill_block(text)
+    for exp in exp_blocks:
+        skill_info = extract_skillinfo(exp)
+        if "name" not in skill_info or not skill_info["name"]:
+            continue
+        skill_info_list.append(skill_info)
+    pass
+    return skill_info_list
+

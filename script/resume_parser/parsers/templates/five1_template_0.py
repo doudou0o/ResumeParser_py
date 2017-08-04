@@ -75,6 +75,14 @@ def split_train_block(text):
     exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
     return exp_blocks
 
+def split_skill_block(text):
+    def issplit(i, lines):
+        if re.search(skill_reg, lines[i]):
+            return True
+        else:
+            return False
+    exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
+    return exp_blocks
 
 
 def extract_eduinfo(expblock):
@@ -127,6 +135,13 @@ def extract_basicinfo(text):
             if line_pre.strip().startswith(u"更新时间："):
                 m = re.search("\d{4}-\d{2}-\d{2}", line_pre)
                 if m: basic_info["updated_at"]=m.group()
+        if "name" not in basic_info and re.search(u"^ID:\d{4,}", line):
+            if len(StringUtils.get_words(line_pre)) in [2,3,4]:
+                basic_info["name"] = line_pre
+        if "name" not in basic_info and re.search(u"^\d{11}", line):
+            if len(StringUtils.get_words(line_pre)) in [2,3,4]:
+                basic_info["name"] = line_pre
+
         ## email phone
         email = match_basic.match_email(line)
         phone = match_basic.match_phone(line)
@@ -314,6 +329,16 @@ def extract_traininfo(text):
 
     return train
 
+def extract_skillinfo(text):
+    skill = resume_struct.get_skill_struct()
+
+    for line in text.split('\n'):
+        m_skill = re.search(skill_reg, line)
+        if m_skill:
+            skill["name"] = m_skill.group(1).strip()
+            skill["level"] = m_skill.group(2).strip()
+
+    return skill
 
 
 ###### 51job_0 template config
@@ -326,6 +351,8 @@ Headline_Dict[u"工作经验"] =  4
 Headline_Dict[u"项目经验"] =  6
 Headline_Dict[u"语言能力"] =  8
 Headline_Dict[u"语言"] =  8
+Headline_Dict[u"技能"] =  10
+Headline_Dict[u"IT技能"]   = 10
 
 Headline_Dict[u"所获奖项"] = 99
 Headline_Dict[u"培训经历"] =  9
@@ -358,3 +385,5 @@ project_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})-((?P<ey>\d{4})\s*/(?P<em>\d{1,
 certi_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})\s+(?P<name>.+)"
 
 train_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})-((?P<ey>\d{4})\s*/(?P<em>\d{1,2})|(?P<ep>至今))\s+(?P<train>.+)"
+
+skill_reg = u"(.+?)\s+(.+)"

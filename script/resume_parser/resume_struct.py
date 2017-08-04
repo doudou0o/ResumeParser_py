@@ -29,6 +29,9 @@ def get_certificate_struct():
 def get_training_struct():
     return resume_train_struct.copy()
 
+def get_skill_struct():
+    return resume_skill_struct.copy()
+
 def getStructByKey(kname):
     if   kname == "education":
         return get_education_struct()
@@ -42,6 +45,8 @@ def getStructByKey(kname):
         return get_certificate_struct()
     elif kname == "training":
         return get_training_struct()
+    elif kname == "skill":
+        return get_skill_struct()
     else:
         raise Exception("no such key name:" + str(kname))
 
@@ -132,6 +137,7 @@ resume_struct = {
         "language":[],
         "certificate":[],
         "training":[],
+        "skill":[],
 }
 
 # origin resume basic info struct
@@ -267,5 +273,12 @@ resume_train_struct = {
     "certificate"       : "",
     "authority"         : "",
     "description"       : "",
+}
+
+# origin resume skill info struct
+resume_skill_struct = {
+    "name"         : "",
+    "level"        : "",
+    "period"       : "",
 }
 
