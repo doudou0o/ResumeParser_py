@@ -53,6 +53,9 @@ def divideHeadlineBlock(text, headlines={}, isOnly=False):
         else:
             blocks[-1][1] += '\n'+lines[i]
 
+
+    blocks.extend(_split_enResume_block(blocks.pop()))
+
     return blocks
 
 
@@ -136,7 +139,7 @@ def _isHeadline(preline, line, nextline, headlines_dict):
 
     if _isHeadline(line, nextline, "", headlines_dict):
         return None
- 
+
     if line in headlines_dict:
         return [headlines_dict[line]]
 
@@ -149,6 +152,17 @@ def _isHeadline(preline, line, nextline, headlines_dict):
 
     return None
 
+def _split_enResume_block(block):
+    blocks = [block[0], block[1]]
+    text_lines = block[1].split("\n")
+    for i, line in enumerate(text_lines):
+        if len(text_lines) - i < 10: break
+        if not re.search(u"[\u4e00-\u9fa5]", line) and \
+                len(re.findall(u"[\u4e00-\u9fa5]","\n".join(text_lines[i:])))<10:
+            blocks = [[block[0], "\n".join(text_lines[:i])], [[100], "\n".join(text_lines[i:])]]
+            break
+
+    return blocks
 
 def _clean_cand_headline(text):
     text = text.strip().upper()
