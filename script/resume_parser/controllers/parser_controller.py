@@ -22,7 +22,7 @@ def run(req):
         filetext = convert(fileori)
         if filetext is None or len(filetext) < 20:
             logger.warning("file text cannot got, get from k18 next")
-            filetext = get_filetext_from_k18(fileori)
+            filetext = get_filetext_from_k18(fileori, filename.split(".")[-1])
         if filetext is None or len(filetext) < 20:
             raise Exception("file text is too short!!")
 

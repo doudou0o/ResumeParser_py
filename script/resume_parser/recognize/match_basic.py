@@ -3,7 +3,6 @@
 
 import re
 
-
 """
 match_phone
 match_email
@@ -62,10 +61,11 @@ def match_language(text):
     #else:
     #    return None
 
-    ### templary way
-    if text.endswith(u"语") and len(text) < 4:
-        return text
-    else:
-        return None
+    ### templory way
+    for word in re.split(u"[\s（）]", text):
+        if (word.endswith(u"语") or word.endswith(u"话")) and len(word) < 4:
+            return word
+        else:
+            return None
     
 

@@ -49,7 +49,8 @@ print ans["ori_block_text"] if "ori_block_text" in ans else ""
 
 print "*************************************"
 print u"姓名:%s\t年龄:%d\t性别:%s" % (ans["basic"]["name"],ans["basic"]["age"],ans["basic"]["gender"])
-print u"手机:%s\t生日:%s\n" % (ans["contact"]["phone"],ans["basic"]["birth"])
+print u"手机:%s\t生日:%s" % (ans["contact"]["phone"],ans["basic"]["birth"])
+print u"email:%s\n" % ans["contact"]["email"]
 
 print u"期望地点:%s" % ans["basic"]["expect_city_names"]
 print u"期望职位:%s" % ans["basic"]["expect_position_name"]
