@@ -57,13 +57,17 @@ def _get_parse_func_dict(template):
             template.split_train_block, template.extract_traininfo
             )
 
+    ## skill
+    _parseinfo_func_dict[10] = partial(parse_skill_info,
+            template.split_skill_block, template.extract_skillinfo
+            )
+
     return _parseinfo_func_dict
 
 
 def parse(filename, filetext, fileori):
     # TODO
     # filename can used to parse or confirm name in resume
-    return None
 
     for template in templates.get_parse_templates(pname):
         logger.debug("parser:%s run a mission" % (pname+template.template_name))
