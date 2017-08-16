@@ -115,7 +115,7 @@ def extract_basicinfo(text):
         ## name update
         m_update = re.search(u"更新时间：\s*(?P<up>\d{4}-\d{2}-\d{2})", line)
         if m_update:
-            basic_info["updated_at"] = m_update.group("up")
+            basic_info["updated_at"] = m_update.group("up")+" 00:00:00"
         if len(line.split("|"))==3:
             if len(StringUtils.get_words(line_pre.strip())) in [2,3,4]:
                 basic_info["name"] = line_pre.strip()

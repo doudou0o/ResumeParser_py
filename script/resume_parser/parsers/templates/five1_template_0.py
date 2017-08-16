@@ -77,12 +77,21 @@ def split_train_block(text):
 
 def split_skill_block(text):
     def issplit(i, lines):
-        if re.search(skill_reg, lines[i]):
+        if i+1<len(lines) and re.search(u"^(熟练|精通|良好|一般)", lines[i+1]) or re.search(u".{2,}\s+(熟练|精通|良好|一般)", lines[i]):
             return True
         else:
             return False
     exp_blocks = divideModule.divideExpBlock(text, isSplit=issplit)
-    return exp_blocks
+
+    exp_blocks_final = []
+    for block in exp_blocks:
+        m=re.search(u"(?P<o>(.+)(熟练|精通|良好|一般))(?P<t>(.+)(熟练|精通|良好|一般))", block)
+        if m:
+            exp_blocks_final.append(m.group("o").strip())
+            exp_blocks_final.append(m.group("t").strip())
+        else:
+            exp_blocks_final.append(block)
+    return exp_blocks_final
 
 
 def extract_eduinfo(expblock):
@@ -134,7 +143,7 @@ def extract_basicinfo(text):
                 basic_info["name"] = re.search(u"(.+)\s*ID", line).group(1).strip()
             if line_pre.strip().startswith(u"更新时间："):
                 m = re.search("\d{4}-\d{2}-\d{2}", line_pre)
-                if m: basic_info["updated_at"]=m.group()
+                if m: basic_info["updated_at"]=m.group()+" 00:00:00"
         if "name" not in basic_info and re.search(u"^ID:\d{4,}", line):
             if len(StringUtils.get_words(line_pre)) in [2,3,4]:
                 basic_info["name"] = line_pre
@@ -196,16 +205,23 @@ def extract_expectinfo(text):
         mpos = re.search(u"^职能：(.+?)\s*(行业|$)", line)
         if mpos:
             expectinfo["expect_position_name"] = re.sub(u"[\u2003 ]", ",", mpos.group(1).strip()).strip()
-        mindus = re.search(u"^行业：(.+)$", line)
+        mindus = re.search(u"行业：(.+)$", line)
         if mindus:
             expectinfo["expect_industry_name"] = re.sub(u"[\u2003 ]", ",", mindus.group(1).strip()).strip()
         msalary = re.search(u"^期望薪资：(.+)$", line)
         if msalary:
             expectsalary = msalary.group(1).strip()
-            m_monthsal = re.search("(?P<f>\d{3,5})-(?P<t>\d{3,5})", expectsalary)
-            if m_monthsal:
-                expectinfo["expect_salary_from"] = float(m_monthsal.group('f'))/1000.0
-                expectinfo["expect_salary_to"] = float(m_monthsal.group('t'))/1000.0
+            if re.search(u"月", expectsalary):
+                m_monthsal = re.search("(?P<f>\d{3,5})-(?P<t>\d{3,5})", expectsalary)
+                if m_monthsal:
+                    expectinfo["expect_salary_from"] = float(m_monthsal.group('f'))/1000.0
+                    expectinfo["expect_salary_to"] = float(m_monthsal.group('t'))/1000.0
+            if re.search(u"年", expectsalary):
+                m_annualsal = re.search("(?P<f>\d{1,2})-(?P<t>\d{1,2})", expectsalary)
+                if m_annualsal:
+                    expectinfo["expect_annual_salary_from"] = float(m_annualsal.group('f'))*10.0
+                    expectinfo["expect_annual_salary_to"] = float(m_annualsal.group('t'))*10.0
+
 
         if selfremark:
             expectinfo["self_remark"] += "\n"+line
@@ -222,18 +238,21 @@ def extract_workinfo(text):
 
     lastline = "not found company"
     for line in text.split('\n'):
+        if re.search(u"工作描述(:|：)", line):
+            lastline = "position"
         if lastline == "not found company":
             m_company = re.search(work_reg, line)
             if m_company:
                 timestamp = match_timestamp.match_timestamp_by_reg(work_reg, line)
-                work["corporation_name"] = m_company.group("company").strip()
+                work["corporation_name"] = clean_company_name(m_company.group("company").strip())
                 work["start_time"], work["end_time"], work["so_far"] = StringUtils.transform_timestamp(timestamp)
                 lastline = "company name"
             pass
         elif lastline == "company name":
             items = line.split("|")
-            if len(items)>0: work["industry_name"] = items[0].strip()
-            lastline = "industry"
+            if len(items)>0:
+                work["industry_name"] = items[0].strip()
+                lastline = "industry"; continue
         elif lastline == "industry":
             items = re.split("\s+", line)
             if len(items) > 1:
@@ -245,6 +264,18 @@ def extract_workinfo(text):
     pass
     work["responsibilities"] = re.sub(u"^工作描述(:|：)", "",  work["responsibilities"]).strip()
     return work
+
+def clean_company_name(c_name):
+    c_name_ori = c_name
+    c_name = re.sub(u"^(:|：)","",c_name)
+    c_name = re.sub(u"[（）\(\)\[\]]$","",c_name)
+    c_name = re.sub(u"\d+\s*(年|个月)$","",c_name)
+    c_name = re.sub(u"\d+$","",c_name)
+    c_name = re.sub(u"\d+-\d+人.+","",c_name)
+    c_name = c_name.strip()
+    if c_name == c_name_ori: return c_name
+    else:
+        return clean_company_name(c_name)
 
 def extract_projectinfo(text):
     project = resume_struct.get_project_struct()
@@ -282,7 +313,7 @@ def extract_languageinfo(text):
     lines = text.split('\n')
 
     for line_pre, line in izip([""]+lines, lines):
-        ans = match_basic.match_language(line_pre)
+        ans = match_basic.match_language(line_pre, False)
         # 语言和等级分两行的情况
         if ans:
             lang["name"] = ans.strip()
@@ -290,9 +321,9 @@ def extract_languageinfo(text):
         # 语言和等级在一行的情况
         else:
             items = filter(lambda x: len(x)>1 , re.split("\s+", line))
-            if len(items)==2 and match_basic.match_language(items[0]):
+            if len(items)>=2 and match_basic.match_language(items[0]):
                 lang["name"] = items[0]
-                lang["level"] = items[1]
+                lang["level"] = re.search(u"(熟练|精通|良好|一般)", items[1]).group()
         pass
     return lang
 
@@ -317,10 +348,10 @@ def extract_traininfo(text):
             timestamp = match_timestamp.match_timestamp_by_reg(train_reg, line)
             train["name"] = m_train.group("train").strip()
             train["start_time"], train["end_time"], train["so_far"] = StringUtils.transform_timestamp(timestamp)
-        mauth = re.search(u"^培训机构：(.+)", line)
+        mauth = re.search(u"培训机构：(.+?)(培训|$)", line)
         if mauth:
             train["authority"] = mauth.group(1).strip()
-        mcity = re.search(u"^培训地点：(.+)", line)
+        mcity = re.search(u"培训地点：(.+?)(培训|$)", line)
         if mcity:
             train["city"] = mcity.group(1).strip()
         mdesc = re.search(u"^培训描述：(.+)", line)
@@ -332,11 +363,19 @@ def extract_traininfo(text):
 def extract_skillinfo(text):
     skill = resume_struct.get_skill_struct()
 
-    for line in text.split('\n'):
-        m_skill = re.search(skill_reg, line)
-        if m_skill:
-            skill["name"] = m_skill.group(1).strip()
-            skill["level"] = m_skill.group(2).strip()
+    lines = text.split('\n')
+    for line, line_next in izip([""]+lines, lines+[""]):
+        if not line:continue
+        m_skill_oneline = re.search(u"(?P<name>.{2,}?)\s+(?P<l>熟练|精通|良好|一般)", line)
+        if m_skill_oneline:
+            skill["name"] = m_skill_oneline.group("name").strip()
+            skill["level"] = m_skill_oneline.group("l").strip()
+            break
+        m_skill_twoline = re.search(u"^(?P<l>熟练|精通|良好|一般)", line_next)
+        if m_skill_twoline:
+            skill["name"] = line
+            skill["level"] = m_skill_twoline.group("l").strip()
+            break
 
     return skill
 
@@ -386,4 +425,3 @@ certi_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})\s+(?P<name>.+)"
 
 train_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})-((?P<ey>\d{4})\s*/(?P<em>\d{1,2})|(?P<ep>至今))\s+(?P<train>.+)"
 
-skill_reg = u"(.+?)\s+(.+)"

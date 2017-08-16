@@ -53,7 +53,7 @@ def match_marital(text):
     else:
         return "U"
 
-def match_language(text):
+def match_language(text, is_split=True):
     ### after bank is ready
     #ans = bank.find_language(text)
     #if ans:
@@ -61,9 +61,15 @@ def match_language(text):
     #else:
     #    return None
 
+    def islanuage(word):
+        return (word.endswith(u"语") or word.endswith(u"话")) and len(word) < 4
+
     ### templory way
+    if not is_split:
+        return islanuage(text)
+
     for word in re.split(u"[\s（）]", text):
-        if (word.endswith(u"语") or word.endswith(u"话")) and len(word) < 4:
+        if islanuage(word):
             return word
         else:
             return None

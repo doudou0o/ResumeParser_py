@@ -120,7 +120,7 @@ def extract_basicinfo(text):
         ## update
         m_update = re.search(u"最近登录：\s*(?P<up>\d{4}-\d{2}-\d{2})", line)
         if m_update:
-            basic_info["updated_at"] = m_update.group("up")
+            basic_info["updated_at"] = m_update.group("up")+" 00:00:00"
 
         ## name
         m_name = re.search(u"姓名(:|：)\s*(?P<n>.+?)\s+", line)
@@ -146,6 +146,12 @@ def extract_basicinfo(text):
         if maddress:
             basic_info["address_str"] = maddress.group("a").strip()
             basic_info["address"] = match_region.match_region(maddress.group("a").strip())
+        mexper = re.search(u"工作年限(:|：)\s*(?P<n>\d)\s*年", line)
+        if mexper:
+            basic_info["work_experience"] = int(mexper.group("n"))
+        maccount = re.search(u"户籍(:|：)\s*(?P<a>.+)", line)
+        if maccount:
+            basic_info["account"] = match_region.match_region(maccount.group("a").strip())
 
     return  basic_info
 
@@ -182,6 +188,11 @@ def extract_expectinfo(text):
             if m_monthsal:
                 expectinfo["expect_salary_from"] = float(m_monthsal.group('f'))/1000.0
                 expectinfo["expect_salary_to"] = float(m_monthsal.group('t'))/1000.0
+        m_yearsalary = re.search(u"^期望年薪：\s*(\d+\.\d+)万", line)
+        if m_yearsalary:
+            expectsalary = m_yearsalary.group(1).strip()
+            expectinfo["expect_annual_salary_from"] = float(expectsalary)*10.0
+            expectinfo["expect_annual_salary_to"] = float(expectsalary)*10.0
 
     return expectinfo
 
@@ -247,6 +258,9 @@ def extract_projectinfo(text):
             project["name"], time_found = line, False
             continue
 
+        m_posi = re.search(u"项目职务(:|：)\s*(?P<posi>.+)", line)
+        if m_posi:
+            project["position_name"] = m_posi.group("posi")
         m_corp = re.search(u"所在公司(:|：)(?P<corp>.+)", line)
         if m_corp:
             project["corporation_name"] = m_corp.group("corp")

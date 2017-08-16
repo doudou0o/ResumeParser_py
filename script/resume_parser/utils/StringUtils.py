@@ -101,9 +101,9 @@ def transform_timestamp(timestamp_str):
     rtype: start_time, end_time, so_far
     """
     if not timestamp_str or -1 == timestamp_str.find("-"):
-        return "","",""
+        return "","","N"
 
-    start_time,end_time,so_far = "","",""
+    start_time,end_time,so_far = "","","N"
 
     start_time = timestamp_str.split("-")[0]
     if "present" == timestamp_str.split("-")[1]:

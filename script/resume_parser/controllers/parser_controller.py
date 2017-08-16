@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import time
 
 from convert import getConvertFunc
 from k18 import get_filetext_from_k18
@@ -18,11 +19,14 @@ def run(req):
 
     # temporary module of convert file
     if not filetext:
+        start = time.time()
         convert = getConvertFunc(filename.split(".")[-1])
         filetext = convert(fileori)
+        logger.info("file text convert finished, using time:%f" % (time.time()-start))
         if filetext is None or len(filetext) < 20:
-            logger.warning("file text cannot got, get from k18 next")
+            logger.warning("file text cannot got, get from k18 next");start = time.time()
             filetext = get_filetext_from_k18(fileori, filename.split(".")[-1])
+            logger.warning("file text cannot got, get from k18 finished,using time:%f" % (time.time()-start))
         if filetext is None or len(filetext) < 20:
             raise Exception("file text is too short!!")
 

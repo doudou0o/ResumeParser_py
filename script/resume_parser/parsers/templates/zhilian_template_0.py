@@ -113,7 +113,7 @@ def extract_basicinfo(text):
         ## update
         mupdate = re.search(u"简历更新时间(:|：)\s*(?P<t>\d{4}\.\d{2}\.\d{2})",line_pre+line)
         if mupdate:
-            basic_info["updated_at"]=mupdate.group("t").replace(".", "-")
+            basic_info["updated_at"]=mupdate.group("t").replace(".", "-")+" 00:00:00"
 
         ## name
         mname_id = re.search(u"^ID：", line_pre)

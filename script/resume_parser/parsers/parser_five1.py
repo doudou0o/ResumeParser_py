@@ -3,6 +3,7 @@
 
 from functools import partial
 import logging
+import time
 
 from parser_basic import *
 import templates
@@ -71,6 +72,7 @@ def parse(filename, filetext, fileori):
     # TODO
     # filename can used to parse or confirm name in resume
 
+    start = time.time()
     for template in templates.get_parse_templates(pname):
         logger.debug("parser:%s run a mission" % (pname+template.template_name))
 
@@ -83,16 +85,16 @@ def parse(filename, filetext, fileori):
 
         if len(resume_ret["work"]) < 1 and \
                 len(divideModule.getBlockByid(resume_ret["ori_block_text"], 4).split("\n"))>5:
-            logger.info("parser:%s miss work" % (pname+template.template_name))
+            logger.info("parser:%s miss work. using time:%f" % (pname+template.template_name, time.time()-start))
             continue
 
         if len(resume_ret["education"]) < 1 and \
                 len(divideModule.getBlockByid(resume_ret["ori_block_text"], 5).split("\n"))>5:
-            logger.info("parser:%s miss edu" % (pname+template.template_name))
+            logger.info("parser:%s miss edu. using time:%f" % (pname+template.template_name, time.time()-start))
             continue
 
         if len(resume_ret["work"]) < 1 and len(resume_ret["education"]) < 1:
-            logger.info("parser:%s miss all work and edu" % (pname+template.template_name))
+            logger.info("parser:%s miss all work and edu. using time:%f" % (pname+template.template_name, time.time()-start))
             continue
 
         # get contact from basic
@@ -106,7 +108,7 @@ def parse(filename, filetext, fileori):
         # add resume name
         resume_ret["basic"]["resume_name"] = filename
 
-        logger.info("parser:%s passed and return one result" % (pname+template.template_name))
+        logger.info("parser:%s passed and return one result. using time:%f" % (pname+template.template_name, time.time()-start))
         return resume_ret
 
     return None
