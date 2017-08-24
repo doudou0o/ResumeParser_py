@@ -77,10 +77,13 @@ def checkRequest(req):
     """
     return getErrmsgByReq(req) == ""
 
+from resume_parser.utils import StringUtils
 def clean_filetext(filetext):
     lines = []
     for line in filetext.split("\n"):
         line = line.strip()
+        line = StringUtils.removeShapesSymbols(line)
+        line = StringUtils.removeGeneralPunctuation(line)
         if len(line) < 2:
             continue
         else:

@@ -144,7 +144,7 @@ def extract_basicinfo(text):
             if line_pre.strip().startswith(u"更新时间："):
                 m = re.search("\d{4}-\d{2}-\d{2}", line_pre)
                 if m: basic_info["updated_at"]=m.group()+" 00:00:00"
-        if "name" not in basic_info and re.search(u"^ID:\d{4,}", line):
+        if "name" not in basic_info and re.search(u"^ID(:|：)\d{4,}", line):
             if len(StringUtils.get_words(line_pre)) in [2,3,4]:
                 basic_info["name"] = line_pre
         if "name" not in basic_info and re.search(u"^\d{11}", line):
@@ -271,7 +271,8 @@ def clean_company_name(c_name):
     c_name = re.sub(u"[（）\(\)\[\]]$","",c_name)
     c_name = re.sub(u"\d+\s*(年|个月)$","",c_name)
     c_name = re.sub(u"\d+$","",c_name)
-    c_name = re.sub(u"\d+-\d+人.+","",c_name)
+    c_name = re.sub(u"\d+-\d+人.*","",c_name)
+    c_name = re.sub(u"少于\d+人.*","",c_name)
     c_name = c_name.strip()
     if c_name == c_name_ori: return c_name
     else:

@@ -98,7 +98,9 @@ def parse(filename, filetext, fileori):
         if len(resume_ret["work"]) < 1 and len(resume_ret["education"]) < 1:
             logger.info("parser:%s miss all work and edu. using time:%f" % (pname+template.template_name,  time.time()-start))
             continue
-
+        if len(resume_ret["basic"]["name"]) < 1:
+            logger.info("parser:%s miss all basic_name . using time:%f" % (pname+template.template_name,  time.time()-start))
+            continue
         # get contact from basic
         if "contact_phone" in resume_ret["basic"]:
             resume_ret["contact"]["phone"] = resume_ret["basic"]["contact_phone"]
@@ -106,7 +108,6 @@ def parse(filename, filetext, fileori):
             resume_ret["contact"]["tel"] = resume_ret["basic"]["contact_tel"]
         if "contact_email" in resume_ret["basic"]:
             resume_ret["contact"]["email"] = resume_ret["basic"]["contact_email"]
-
         # add resume name
         resume_ret["basic"]["resume_name"] = filename
 

@@ -87,7 +87,7 @@ def assemble_response(header, ERR, err_msg, results):
     ret["header"] = header
     ret["response"] = response
 
-    logger.info("##### send response: %s" % str(response))
+    logger.info("##### send response: %s" % resp2str(response))
     return ret
 
 
@@ -138,6 +138,27 @@ class CustomGearmanWorker(gearman.GearmanWorker):
     def on_job_execute(self, current_job):
         return super(CustomGearmanWorker, self).on_job_execute(current_job)
     pass
+
+def req2str(req_dict):
+    req = copy.deepcopy(req_dict)
+    try:
+        req["request"]["p"]["filetext"] = req["request"]["p"]["filetext"][:100]
+        req["request"]["p"]["fileori"] = req["request"]["p"]["fileori"][:100]
+        return str(req)
+    except:
+        return str(req)
+
+def resp2str(resp_dict):
+    res = copy.deepcopy(resp_dict)
+    try:
+        if res["results"] is not None:
+            res["results"] = {"parser_name": res["results"]["parser_name"]}
+        return str(res)
+    except:
+        return str(res)
+
+
+
 
 
 from enum import Enum

@@ -66,7 +66,8 @@ def match_language(text, is_split=True):
 
     ### templory way
     if not is_split:
-        return islanuage(text)
+        if islanuage(text): return text
+        else: return None
 
     for word in re.split(u"[\s（）]", text):
         if islanuage(word):

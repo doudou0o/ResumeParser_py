@@ -116,7 +116,7 @@ def extract_basicinfo(text):
         m_update = re.search(u"更新时间：\s*(?P<up>\d{4}-\d{2}-\d{2})", line)
         if m_update:
             basic_info["updated_at"] = m_update.group("up")+" 00:00:00"
-        if len(line.split("|"))==3:
+        if len(line.split("|"))>=3:
             if len(StringUtils.get_words(line_pre.strip())) in [2,3,4]:
                 basic_info["name"] = line_pre.strip()
 
@@ -139,14 +139,14 @@ def extract_basicinfo(text):
         if mexp: basic_info["work_experience"] = int(mexp.group(1))
         mmary = re.search(u"婚姻状况：(.+)", line)
         if mmary:basic_info["marital"] = match_basic.match_marital(mmary.group(1).strip())
-        maccount = re.search(u"户口/国籍：(.+)", line)
+        maccount = re.search(u"(户口/国籍|户\s*口)(：|:)(?P<acc>.+)", line)
         if maccount:
-            basic_info["account_str"] = maccount.group(1).strip()
-            basic_info["account"] = match_region.match_region(maccount.group(1).strip())
-        maddress = re.search(u"现居住?(.+?)(\||$)", line)
+            basic_info["account_str"] = maccount.group("acc").strip()
+            basic_info["account"] = match_region.match_region(maccount.group("acc").strip())
+        maddress = re.search(u"(居住地|现居住)(:|：)\s*(?P<s>.+?)(\t|\||$)", line)
         if maddress:
-            basic_info["address_str"] = maddress.group(1).strip()
-            basic_info["address"] = match_region.match_region(maddress.group(1).strip())
+            basic_info["address_str"] = maddress.group("s").strip()
+            basic_info["address"] = match_region.match_region(maddress.group("s").strip())
 
     return  basic_info
 
@@ -210,13 +210,17 @@ def extract_workinfo(text):
         if m_position:
             work["position_name"] = m_position.group("pos").replace(u"(兼职)", "").strip()
             work["architecture_name"] = m_position.group("arc")
-        m_industry = re.search(u"(行业|所属行业)(：|:)(?P<ind>.+?)(\s|$)", line)
+        m_industry = re.search(u"(行业|所属行业)(：|:)\s*(?P<ind>.+?)(\s|$)", line)
         if m_industry:
             work["industry_name"] = m_industry.group("ind").strip()
             last_industry = True
             continue
-        if not work["position_name"] and last_industry and len(line.split("\t")) == 2:
-            work["position_name"] = line.split("\t")[1].strip()
+        if not work["position_name"] and last_industry:
+            if len(line.split("\t")) == 2:
+                work["architecture_name"] = line.split("\t")[0].strip()
+                work["position_name"] = line.split("\t")[1].strip()
+            if len(line.split("\t")) == 1:
+                work["position_name"] = line.split("\t")[0].strip()
             continue
         if last_industry:
             work["responsibilities"] += "\n"+line if work["responsibilities"] else line
@@ -230,7 +234,8 @@ def clean_company_name(c_name):
     c_name = re.sub(u"[（）\(\)\[\]]$","",c_name)
     c_name = re.sub(u"\d+\s*(年|个月)$","",c_name)
     c_name = re.sub(u"\d+$","",c_name)
-    c_name = re.sub(u"\d+-\d+人.+","",c_name)
+    c_name = re.sub(u"\d+-\d+人.*","",c_name)
+    c_name = re.sub(u"少于\d+人.*","",c_name)
     c_name = c_name.strip()
     if c_name == c_name_ori: return c_name
     else:
@@ -275,9 +280,10 @@ def extract_languageinfo(text):
 
     for line in text.split('\n'):
         language = match_basic.match_language(re.split("\s+", line)[0])
-        if language:
-            lang["name"] = language.strip()
-            lang["level"] = re.split("\s+", line)[1].strip()
+        level_m = re.search(u"精通|熟练|良好|一般", line)
+        if language: lang["name"] = language.strip()
+        if level_m: lang["level"] = level_m.group()
+        if "level" in lang and "name" in lang: break;
     return lang
 
 def extract_certinfo(text):
@@ -360,7 +366,7 @@ Headline_Dict[u"附件"]     = 99
 edu_reg = u"(?P<sy>\d{4})\s*/\s*(?P<sm>\d{1,2})-{1,2}(((?P<ey>\d{4})\s*/\s*(?P<em>\d{1,2}))|(?P<ep>至今))\s*\t+(?P<school>.+?)\t+(?P<disc>.+?)\t+(?P<degree>.+)"
 
 # 51job work config
-work_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})\s*-{1,2}\s*((?P<ey>\d{4})\s*/(?P<em>\d{1,2})|(?P<ep>至今))\s*(?P<company>.+\s).+(\[\s*\d+\s*年|\s*\d+\s*个月)"
+work_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})\s*-{1,2}\s*((?P<ey>\d{4})\s*/(?P<em>\d{1,2})|(?P<ep>至今))\s*(?P<company>.+)(\[\s*\d+\s*年|\s*\d+\s*个月)"
 
 # 51job project config
 project_reg = u"^(?P<sy>\d{4})\s*/(?P<sm>\d{1,2})-{1,2}((?P<ey>\d{4})\s*/(?P<em>\d{1,2})|(?P<ep>至今))(?P<project>.+)"

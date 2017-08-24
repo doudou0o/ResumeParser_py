@@ -114,6 +114,7 @@ def extract_basicinfo(text):
     lines = text.split('\n')
     if lines[0].startswith(u"自我评价"):
         basic_info["self_remark"] = "\n".join(lines[1:])
+        basic_info["self_remark"] = re.sub(u"目标人选\s*不合适\s*登录猎聘网查看更多简历", "", basic_info["self_remark"])
         return basic_info
 
     for line_pre, line in izip([""]+lines, lines):
@@ -234,7 +235,8 @@ def clean_company_name(c_name):
     c_name = re.sub(u"[（）\(\)\[\]]$","",c_name)
     c_name = re.sub(u"\d+\s*(年|个月)$","",c_name)
     c_name = re.sub(u"\d+$","",c_name)
-    c_name = re.sub(u"\d+-\d+人.+","",c_name)
+    c_name = re.sub(u"\d+-\d+人.*","",c_name)
+    c_name = re.sub(u"少于\d+人.*","",c_name)
     c_name = c_name.strip()
     if c_name == c_name_ori: return c_name
     else:

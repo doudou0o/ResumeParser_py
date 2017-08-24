@@ -126,8 +126,11 @@ def extract_basicinfo(text):
         ## email phone
         email = match_basic.match_email(line)
         phone = match_basic.match_phone(line)
+        m_ph = re.search(u"^手机：(\d+)", re.sub(u"(\(|（).+(\)|）)", "",line).replace(" ",""))
         if email: basic_info["contact_email"] = email
-        if phone: basic_info["contact_phone"] = phone
+        if m_ph: basic_info["contact_phone"] = m_ph.group(1)
+        elif phone and "contact_phone" not in basic_info:
+            basic_info["contact_phone"] = phone
 
         ## gender age birth
         if "U" != match_basic.match_gender(line) and (u"岁" in line or u"经验" in line):
@@ -224,9 +227,12 @@ def extract_workinfo(text):
             pass
         elif lastline == "company name":
             items = line.split("|")
-            if len(items)>1:
+            if len(items)==3:
                 work["architecture_name"] =items[0].strip()
                 work["position_name"] =items[1].strip()
+                lastline = "position"
+            if len(items)==2:
+                work["position_name"] =items[0].strip()
                 lastline = "position"
         elif lastline == "position":
             items = line.split("|")
@@ -246,7 +252,8 @@ def clean_company_name(c_name):
     c_name = re.sub(u"[（）\(\)\[\]]$","",c_name)
     c_name = re.sub(u"\d+\s*(年|个月)$","",c_name)
     c_name = re.sub(u"\d+$","",c_name)
-    c_name = re.sub(u"\d+-\d+人.+","",c_name)
+    c_name = re.sub(u"\d+-\d+人.*","",c_name)
+    c_name = re.sub(u"少于\d+人.*","",c_name)
     c_name = c_name.strip()
     if c_name == c_name_ori: return c_name
     else:
@@ -258,7 +265,7 @@ def extract_projectinfo(text):
     project["ori_text"] = text
     lines = text.split("\n")
 
-    isDesc, isResp = True, False
+    isDesc, isResp = False, False
     for preline, line in izip([""]+lines, lines):
         m_proj = re.search(project_reg, line)
         if m_proj:
@@ -275,8 +282,8 @@ def extract_projectinfo(text):
             line = re.sub(u"责任描述(:|：)","", line).strip()
             isDesc, isResp = False, True
         pass
-        if isDesc: project["describe"] += '\n'+line if project["describe"] and line else line
-        if isResp: project["responsibilities"] += '\n'+line if project["responsibilities"] and line else line
+        if isDesc:project["describe"] += '\n'+line if project["describe"] and line else line
+        if isResp:project["responsibilities"] += '\n'+line if project["responsibilities"] and line else line
     return project
 
 def extract_languageinfo(text):

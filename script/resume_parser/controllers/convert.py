@@ -13,14 +13,27 @@ try:
 except ImportError:
     from xml.etree.ElementTree import XML
 
+try:
+    from docx import opendocx, getdocumenttext
+    import StringIO
+except:
+    opendocx, getdocumenttext = None, None
+    StringIO = None
+
+
+
 jarPath = os.path.join(os.path.dirname(__file__), "../thirdlibs/convert.jar")
 
 def initJVM():
-    if not jpype.isJVMStarted():
-        jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path="+jarPath)
-    pdfconvertClass = jpype.JClass("com.echeng.convector.pdfconvector.pdf2text")
-    pdfconvertObj   = pdfconvertClass()
-    return pdfconvertObj
+    try:
+        if not jpype.isJVMStarted():
+            jpype.startJVM(jpype.getDefaultJVMPath(), "-Djava.class.path="+jarPath)
+        pdfconvertClass = jpype.JClass("com.echeng.convector.pdfconvector.pdf2text")
+        pdfconvertObj   = pdfconvertClass()
+        return pdfconvertObj
+    except:
+        return None
+
 
 
 def getConvertFunc(fileext):
@@ -35,7 +48,7 @@ def getConvertFunc(fileext):
     elif fileext == "html" or fileext == "htm":
         return convert_html
     elif fileext == "docx":
-        return convert_docx
+        return convert_docx_controller
     elif fileext == "mht":
         return convert_mht
     elif fileext == "doc":
@@ -54,6 +67,12 @@ def convert_mht(fileori):
     except:
         text = ""
     return text
+
+def convert_docx_controller(filori):
+    ans = convert_docx_new(filori)
+    if not ans: return convert_docx(fileori)
+    else: return ans
+
 
 def convert_docx(fileori):
     def get_docx_text(path):
@@ -96,6 +115,17 @@ def convert_docx(fileori):
 
     return text
 
+def convert_docx_new(fileori):
+    if opendocx is None:
+        return ""
+    try:
+        document = opendocx(StringIO.StringIO(fileori))
+        paratextlist = getdocumenttext(document)
+        return "\n".join(paratextlist)
+    except:
+        return ""
+    pass
+
 def convert_html(fileori):
     """
     itype: fileori: str
@@ -127,6 +157,7 @@ def convert_pdf(fileori, restart=True):
     """
     try:
         pdfconvertObj = initJVM()
+        if pdfconvertObj is None: return None
         filetext = pdfconvertObj.convert(fileori)
         return filetext
     except:
